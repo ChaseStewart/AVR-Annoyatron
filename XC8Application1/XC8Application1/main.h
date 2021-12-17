@@ -62,8 +62,10 @@ static const uint8_t numbertable[] = {
 #define HT16K33_CMD_DISP_ON_BLINK (HT16K33_DISP_SET_ADDR | HT16K33_DISP_SET_DISPLAYON | HT16K33_BLINK_1HZ)
 #define HT16K33_CMD_DIM_LEVEL(dimNibble) (0xE0 + (dimNibble & 0x0F))
 
+#define CUT_WIRES_bm (PIN4_bm | PIN5_bm | PIN6_bm | PIN7_bm)
 
 void initPeripherals(void);
+void initCutWires(void);
 void initPIR(void);
 void initLED(void);
 void initSevenSeg(void);

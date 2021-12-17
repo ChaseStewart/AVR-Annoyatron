@@ -21,21 +21,27 @@ int main(void)
 {
    initPeripherals();
 
-   ledUsrBlink(5, 500);
+   ledUsrBlink(10, 300);
    _delay_ms(1000);
 
-   initSevenSeg();
+   //initSevenSeg();
    
-   setSevenSegValue(0, 0);
-   setSevenSegValue(1, 1);
-   setSevenSegValue(3, 2);
-   setSevenSegValue(4, 3);
-   writeSevenSeg();
+   //setSevenSegValue(0, 0);
+   //setSevenSegValue(1, 1);
+   //setSevenSegValue(3, 2);
+   //setSevenSegValue(4, 3);
+   //writeSevenSeg();
 
    while(1)
    {
-      /* set USR_LED IFF PIR sensor is triggered */
-      PORTC.OUT = (PORTC.IN & PIN0_bm) ? PIN2_bm : 0;
+	  if ((PORTA.IN & CUT_WIRES_bm) == CUT_WIRES_bm)
+	  {
+		  PORTC.OUT = 0;
+	  }
+	  else
+	  {
+		PORTC.OUT = PIN2_bm;
+	  }
    }
 }
 
@@ -46,6 +52,7 @@ void initPeripherals(void)
 {
    initLED();
    initPIR();
+   initCutWires();
    I2C_init();
 }
 
@@ -115,6 +122,15 @@ void initPIR(void)
 {
    PORTC.DIRCLR = PIN0_bm;
    PORTC.PIN0CTRL &= ~PORT_PULLUPEN_bm;
+}
+
+void initCutWires(void)
+{
+   PORTA.DIRCLR = CUT_WIRES_bm;
+   PORTA.PIN4CTRL |= PORT_PULLUPEN_bm;	
+   PORTA.PIN5CTRL |= PORT_PULLUPEN_bm;
+   PORTA.PIN6CTRL |= PORT_PULLUPEN_bm;
+   PORTA.PIN7CTRL |= PORT_PULLUPEN_bm;
 }
 
 /** 
