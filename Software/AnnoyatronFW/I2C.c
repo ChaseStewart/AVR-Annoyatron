@@ -263,5 +263,6 @@ uint8_t	I2C_write_bytes(uint8_t slave_addr, uint8_t *addr_ptr, uint8_t slave_reg
 
 error:
 	I2C_recover();
+   ledUsrBlink(0, 100);
 	return 0xff;
 }
