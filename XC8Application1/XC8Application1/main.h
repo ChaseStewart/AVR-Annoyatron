@@ -12,7 +12,8 @@
 
 #define F_CPU 3333333
 
-static const uint8_t numbertable[] = {
+#define LEN_NUM_TABLE 18
+static const uint8_t numbertable[LEN_NUM_TABLE] = {
    0x3F, /* 0 */
    0x06, /* 1 */
    0x5B, /* 2 */
@@ -68,6 +69,7 @@ void initPeripherals(void);
 void initCutWires(void);
 void initPIR(void);
 void initLED(void);
+void initAudio(void);
 void initSevenSeg(void);
 
 void ledUsrBlink(uint8_t count, const int blinkPeriodMsec);

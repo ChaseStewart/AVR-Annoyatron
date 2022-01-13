@@ -5,32 +5,30 @@
 * Author: Chase E. Stewart for Hidden Layer Design
 */
 #include "main.h"
+#include "I2C.h"
 
 #include <xc.h>
 #include <avr/io.h>
 #define __DELAY_BACKWARD_COMPATIBLE__
 #include <util/delay.h>
 
-#include "I2C.h"
 
-
-volatile uint16_t display_buffer[8];
-
+volatile uint8_t display_buffer[5] = {0};
 
 int main(void)
 {
+   uint8_t count = 0;
    initPeripherals();
+   ledUsrBlink(3, 500);
 
-   ledUsrBlink(10, 300);
-   _delay_ms(1000);
-
-   //initSevenSeg();
+   initSevenSeg();
    
-   //setSevenSegValue(0, 0);
-   //setSevenSegValue(1, 1);
-   //setSevenSegValue(3, 2);
-   //setSevenSegValue(4, 3);
-   //writeSevenSeg();
+   setSevenSegValue(0, 0);
+   setSevenSegValue(1, 0);
+   setSevenSegValue(3, 0);
+   setSevenSegValue(4, 0);
+   writeSevenSeg();
+
 
    while(1)
    {
@@ -42,6 +40,15 @@ int main(void)
 	  {
 		PORTC.OUT = PIN2_bm;
 	  }
+     setSevenSegValue(0, count);
+     setSevenSegValue(1, count);
+     setSevenSegValue(2, 0x02);
+     setSevenSegValue(3, count);
+     setSevenSegValue(4, count);
+     writeSevenSeg();
+     _delay_ms(200);
+     count = (count + 1) % 10;
+
    }
 }
 
@@ -50,72 +57,121 @@ int main(void)
  */
 void initPeripherals(void)
 {
+   CLKCTRL.MCLKCTRLA |= CLKCTRL_CLKOUT_bm | CLKCTRL_CLKSEL_OSC20M_gc;
+   CLKCTRL.MCLKCTRLB |= CLKCTRL_PDIV_16X_gc | CLKCTRL_PEN_bm;
    initLED();
    initPIR();
    initCutWires();
    I2C_init();
+   initAudio();
 }
 
 void initSevenSeg(void)
 {
    uint8_t writeCmdByte = 0;
-   uint8_t readBuf[10] = {0};
    uint8_t status;
 
-   /* Clear keylines by reading them */
-   //I2C_read_bytes(SEVENSEG_ADDR, readBuf, HT16K33_KEYDATA0_ADDR, HT16K33_KEYDATA_LEN);
-
    /* Enable HT16K33 oscillator */
-   writeCmdByte = 0x21; //HT16K33_CMD_OSC_ENABLE;
+   writeCmdByte = HT16K33_CMD_OSC_ENABLE;
    I2C_start(SEVENSEG_ADDR);
-   status =    I2C_wait_ACK();
-   if (1 == status)
+   status = I2C_wait_ACK();
+   if (0 != status)
    {
       ledUsrBlink(0, 200);
    }
+   
    I2C_write(&writeCmdByte);
+   status = I2C_wait_ACK();
+   if (0 != status)
+   {
+      ledUsrBlink(0, 100);
+   }
    I2C_stop();
    
    /* Enable HT16K33 display */ 
-   writeCmdByte = 0x81; //HT16K33_CMD_DISP_ON_NOBLINK;
+   writeCmdByte = HT16K33_CMD_DISP_ON_NOBLINK;
    I2C_start(SEVENSEG_ADDR);
+   status = I2C_wait_ACK();
+   if (0 != status)
+   {
+      ledUsrBlink(0, 300);
+   }
+
    I2C_write(&writeCmdByte);
+   status = I2C_wait_ACK();
+   if (0 != status)
+   {
+      ledUsrBlink(0, 400);
+   }
+
    I2C_stop();
 
    /* Set dimming level to 16/16 */
-   writeCmdByte = 0xEF; //HT16K33_CMD_DIM_LEVEL(0x0F);
+   writeCmdByte = HT16K33_CMD_DIM_LEVEL(0x08);
    I2C_start(SEVENSEG_ADDR);
+   status = I2C_wait_ACK();
+   if (0 != status)
+   {
+      ledUsrBlink(0, 500);
+   }
+
    I2C_write(&writeCmdByte);
+   status = I2C_wait_ACK();
+   if (0 != status)
+   {
+      ledUsrBlink(0, 1000);
+   }
    I2C_stop();
 
-   for (int i=0; i<8; i++)
+   for (int i = 0; i < 8; i++)
    {
-      display_buffer[i] = 0;
+      display_buffer[i] = 0xff;
    }
    writeSevenSeg();
 }
 
 void writeSevenSeg(void)
-{
-   uint8_t convert_array[16];
-   
-   for (int i = 0; i < 8; i++) 
+{   
+   for (int i = 0; i < 5; i++)
    {
-      convert_array[i << 1] = display_buffer[i] & 0xFF;
-      convert_array[(i << 1) + 1] = display_buffer[i] >> 8;
+     I2C_write_bytes(SEVENSEG_ADDR, &display_buffer[i], i * 2, 1);
    }
-
-   I2C_write_bytes(SEVENSEG_ADDR, convert_array, 0x00, 16);
 }
 
 void setSevenSegValue(uint8_t index, uint8_t value)
 {
+   if ( index == 2)
+   {
+       	display_buffer[index] =  (0x02 == value ) ? 0x02: 0;      
+   }      
+   
  	/*this function sets a single position in the number table*/
- 	if (index > 4 || value > 17) 
+ 	if ( index > 8 || value > LEN_NUM_TABLE) 
    {
     	return;
  	}
  	display_buffer[index] = numbertable[value];  
+}
+
+void initAudio(void)
+{
+   /*
+    *	set Audio ~SHDN pin high
+    */
+   PORTC.DIRSET = PIN3_bm;
+   PORTC.OUT |= PIN3_bm;
+
+   /*
+    *	setup PWM
+    */
+   PORTA.DIRSET = PIN3_bm;
+   TCA0.SINGLE.CTRLD &= ~TCA_SPLIT_ENABLE_bm;
+   TCA0.SINGLE.PER = 5000;
+   TCA0.SINGLE.CMP0 = 2500;
+   TCA0.SINGLE.CNT = 0;
+   TCA0.SINGLE.CTRLB |= (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_CMP0EN_bm); // we want WO3 so set 0b11
+   TCA0.SINGLE.CTRLB |= (TCA_SINGLE_WGMODE0_bm | TCA_SINGLE_WGMODE1_bm); // WGMode 3 == single PWM
+   TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV2_gc | TCA_SINGLE_ENABLE_bm); // now enable the module
 }
 
 void initPIR(void)
