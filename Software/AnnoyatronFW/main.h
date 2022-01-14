@@ -33,38 +33,41 @@ static const uint8_t numbertable[LEN_NUM_TABLE] = {
    0xFF, /* all on */
    0x00 /* all off */
 };
-
-#define TRUE 1
-#define FALSE 0
+#define SEVENSEG_ALL  LEN_NUM_TABLE - 2
+#define SEVENSEG_NONE LEN_NUM_TABLE - 1
 
 #define SEVENSEG_ADDR (0x70 << 1)
 
-#define HT16K33_KEYDATA0_ADDR 0x40
-#define HT16K33_KEYDATA_LEN 5
+#define _HT16K33_SYS_SETUP_ADDR 0x20
+#define _HT16K33_SYS_SETUP_OSC_ON  0x01
+#define _HT16K33_SYS_SETUP_OSC_OFF 0x00
 
-#define HT16K33_SYS_SETUP_ADDR 0x20
-#define HT16K33_SYS_SETUP_OSC_ON  0x01
-#define HT16K33_SYS_SETUP_OSC_OFF 0x00
-#define HT16K33_CMD_OSC_ENABLE (HT16K33_SYS_SETUP_ADDR | HT16K33_SYS_SETUP_OSC_ON)
-#define HT16K33_CMD_OSC_DISABLE (HT16K33_SYS_SETUP_ADDR | HT16K33_SYS_SETUP_OSC_OFF)
+/* Public OSC commands*/
+#define HT16K33_CMD_OSC_ENABLE (_HT16K33_SYS_SETUP_ADDR | _HT16K33_SYS_SETUP_OSC_ON)
+#define HT16K33_CMD_OSC_DISABLE (_HT16K33_SYS_SETUP_ADDR | _HT16K33_SYS_SETUP_OSC_OFF)
 
-#define HT16K33_DISP_SET_ADDR 0x80
-#define HT16K33_DISP_SET_DISPLAYON 0x01
-#define HT16K33_DISP_SET_DISPLAYOFF 0x00
-#define HT16K33_BLINK_OFF    0x00
-#define HT16K33_BLINK_2HZ    0x02
-#define HT16K33_BLINK_1HZ    0x04
-#define HT16K33_BLINK_HALFHZ 0x06
+#define _HT16K33_DISP_SET_ADDR 0x80
+#define _HT16K33_DISP_SET_DISPLAYON 0x01
+#define _HT16K33_DISP_SET_DISPLAYOFF 0x00
+#define _HT16K33_BLINK_OFF    0x00
+#define _HT16K33_BLINK_2HZ    0x02
+#define _HT16K33_BLINK_1HZ    0x04
+#define _HT16K33_BLINK_HALFHZ 0x06
 
-#define HT16K33_DIM_ADDR 0xE0
-
+/* Public DISP commands */
 #define HT16K33_CMD_DISP_OFF (HT16K33_DISP_SET_ADDR | HT16K33_DISP_SET_DISPLAYOFF | HT16K33_BLINK_OFF)
 #define HT16K33_CMD_DISP_ON_NOBLINK (HT16K33_DISP_SET_ADDR | HT16K33_DISP_SET_DISPLAYON | HT16K33_BLINK_OFF)
 #define HT16K33_CMD_DISP_ON_BLINK (HT16K33_DISP_SET_ADDR | HT16K33_DISP_SET_DISPLAYON | HT16K33_BLINK_1HZ)
-#define HT16K33_CMD_DIM_LEVEL(dimNibble) (0xE0 + (dimNibble & 0x0F))
+
+
+#define _HT16K33_DIM_ADDR 0xE0
+
+/*Public DIM commands */
+#define HT16K33_CMD_DIM_LEVEL(dimNibble) (_HT16K33_DIM_ADDR + (dimNibble & 0x0F))
 
 #define CUT_WIRES_bm (PIN4_bm | PIN5_bm | PIN6_bm | PIN7_bm)
 
+void initClocks(void);
 void initPeripherals(void);
 void initCutWires(void);
 void initPIR(void);
@@ -76,7 +79,6 @@ void ledUsrBlink(uint8_t count, const int blinkPeriodMsec);
 
 void setSevenSegValue(uint8_t index, uint8_t value);
 void writeSevenSeg(void);
-
 
 
 #endif /* MAIN_H_ */
