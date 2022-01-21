@@ -26,40 +26,76 @@ static void initAudio(void);
 static void initCountdownTimer(void);
 static bool PIRisTriggered(void);
 
+volatile bool counterRollover;
 volatile uint32_t tcbCount;
 volatile uint8_t prevTcbCount;
+board_state_t boardState;
+
 
 int main(void)
 {
-   tcbCount = 20*100;
+   counterRollover = false;
+   boardState = board_state_waiting;
+   tcbCount = 10*100;
    initPeripherals();
    sei();
    ledUsrBlink(3, 500);
    
    while(1)
    {
-      if (PIRisTriggered())
+      PORTC.OUT = (PIRisTriggered()) ? PIN2_bm : 0;
+
+      switch(boardState)
       {
-         PORTC.OUT = PIN2_bm;
-         setSevenSegValue(0, (tcbCount / 1000) % 10);
-         setSevenSegValue(1, (tcbCount / 100)  % 10);
-         setSevenSegValue(2, 0x02);
-         setSevenSegValue(3, (tcbCount / 10) % 10);
-         setSevenSegValue(4, tcbCount % 10);
-      }
-      else
-      {
-         PORTC.OUT = 0;
-         setSevenSegValue(0, SEVENSEG_NONE);
-         setSevenSegValue(1, SEVENSEG_NONE);
-         setSevenSegValue(2, SEVENSEG_NONE);
-         setSevenSegValue(3, SEVENSEG_NONE);
-         setSevenSegValue(4, SEVENSEG_NONE);
-      }
-      
-      if (tcbCount != prevTcbCount)
-      {
-         writeSevenSeg();
+         case board_state_waiting:
+            // Waiting for PIR to trigger and send this to countdown
+            
+            if (PIRisTriggered()) 
+            {
+               TCB0.CTRLA = TCB_ENABLE_bm;
+               boardState = board_state_countdown;
+            }
+            break;
+            
+         case board_state_countdown:
+            // Actively update count until wire is cut or counter rolls over
+            
+            setSevenSegValue(0, (tcbCount / 1000) % 10);
+            setSevenSegValue(1, (tcbCount / 100)  % 10);
+            setSevenSegValue(2, 0x02);
+            setSevenSegValue(3, (tcbCount / 10) % 10);
+            setSevenSegValue(4, tcbCount % 10);
+            writeSevenSeg();
+            
+            if (counterRollover)
+            {
+               boardState = board_state_cut;
+               counterRollover = false;
+               sevenSegBlink(true);
+               setSevenSegValue(0, 0);
+               setSevenSegValue(1, 0);
+               setSevenSegValue(2, 2);
+               setSevenSegValue(3, 0);
+               setSevenSegValue(4, 0);
+               writeSevenSeg();
+               TCB0.CNT   = 0;
+               TCB0.CTRLA = 0;
+            }
+            else if ((PORTA.IN & PIN4_bm) == PIN4_bm)
+            {
+               boardState = board_state_cut;
+               sevenSegBlink(true);
+               writeSevenSeg();
+            }
+            break;
+            
+         case board_state_cut:
+            // get stuck forever
+            break;
+            
+         default:
+            // should never get here!
+            ledUsrBlink(0, 1000);
       }
       prevTcbCount = tcbCount;
    }
@@ -91,6 +127,7 @@ static void initClocks(void)
 
 /**
  *	Startup the timer to measure centi-seconds
+ * Still TODO get CCMP just right
  */
 static void initCountdownTimer(void)
 {
@@ -100,7 +137,7 @@ static void initCountdownTimer(void)
    TCB0.INTCTRL = TCB_CAPTEI_bm;
    TCB0.CNT = 0;
    TCB0.CCMP = 0xFFFF;
-   TCB0.CTRLA = TCB_ENABLE_bm;
+   TCB0.CTRLA = 0;
 }
 
 
@@ -144,10 +181,10 @@ static void initPIR(void)
 static void initCutWires(void)
 {
    PORTA.DIRCLR = CUT_WIRES_bm;
-   PORTA.PIN4CTRL |= PORT_PULLUPEN_bm;
-   PORTA.PIN5CTRL |= PORT_PULLUPEN_bm;
-   PORTA.PIN6CTRL |= PORT_PULLUPEN_bm;
-   PORTA.PIN7CTRL |= PORT_PULLUPEN_bm;
+   PORTA.PIN4CTRL = PORT_PULLUPEN_bm;
+   PORTA.PIN5CTRL = PORT_PULLUPEN_bm;
+   PORTA.PIN6CTRL = PORT_PULLUPEN_bm;
+   PORTA.PIN7CTRL = PORT_PULLUPEN_bm;
 }
 
 /**
@@ -168,6 +205,7 @@ static bool PIRisTriggered(void)
 
 /**
 *	Blink usr LED 'count'-many times at a period of 2 * 'blinkPeriodMsec'
+*  NOTE: This is a blocking call! 
 */
 void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
 {
@@ -186,8 +224,16 @@ void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
    PORTC.OUT &= ~PIN2_bm;
 }
 
+/**
+ *	Timer Interrupt for countdown timer TCB0
+ */
 ISR(TCB0_INT_vect)
 {
    TCB0.INTFLAGS = 1;
-   tcbCount = (tcbCount) ? tcbCount - 1  : 20 * 100 ;
+   tcbCount--;
+   if (tcbCount == 0)
+   {
+      counterRollover = true;
+      tcbCount = 10 * 100;
+   }
 }

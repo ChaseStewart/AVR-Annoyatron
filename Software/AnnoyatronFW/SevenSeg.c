@@ -92,7 +92,7 @@ void setSevenSegValue(uint8_t index, uint8_t value)
     */
    if ( index == 2)
    {
-      display_buffer[index] =  (value) ? 0: 0x02;
+      display_buffer[index] =  (value) ? 0x02: 0;
    }
    
    display_buffer[index] = numbertable[value];
@@ -107,4 +107,27 @@ void writeSevenSeg(void)
    {
       I2C_write_bytes(SEVENSEG_ADDR, &display_buffer[i], i * 2, 1);
    }
+}
+
+void sevenSegBlink(bool blinkEnable)
+{
+   uint8_t writeCmdByte = 0;
+   uint8_t status = 0;
+
+   /* Set blink on or off based on provided boolean */
+   writeCmdByte = (blinkEnable) ? HT16K33_CMD_DISP_ON_BLINK : HT16K33_CMD_DISP_ON_NOBLINK;
+   I2C_start(SEVENSEG_ADDR);
+   status = I2C_wait_ACK();
+   if (0 != status)
+   {
+      ledUsrBlink(0, 500);
+   }
+
+   I2C_write(&writeCmdByte);
+   status = I2C_wait_ACK();
+   if (0 != status)
+   {
+      ledUsrBlink(0, 1000);
+   }
+   I2C_stop();
 }

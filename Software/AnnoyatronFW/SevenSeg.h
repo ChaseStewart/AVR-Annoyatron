@@ -5,6 +5,7 @@
  *  Author: vtrre
  */ 
 
+#include <stdbool.h>
 #include "stdint.h"
 
 #ifndef SEVENSEG_H_
@@ -56,7 +57,7 @@ static const uint8_t numbertable[LEN_NUM_TABLE] = {
 /* Public DISP commands */
 #define HT16K33_CMD_DISP_OFF (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYOFF | _HT16K33_BLINK_OFF)
 #define HT16K33_CMD_DISP_ON_NOBLINK (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | _HT16K33_BLINK_OFF)
-#define HT16K33_CMD_DISP_ON_BLINK (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | _HT16K33_BLINK_1HZ)
+#define HT16K33_CMD_DISP_ON_BLINK (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | _HT16K33_BLINK_2HZ)
 
 
 #define _HT16K33_DIM_ADDR 0xE0
@@ -71,6 +72,7 @@ extern volatile uint8_t display_buffer[5];
 void initSevenSeg(void);
 void setSevenSegValue(uint8_t index, uint8_t value);
 void writeSevenSeg(void);
+void sevenSegBlink(bool blinkEnable);
 
 
 

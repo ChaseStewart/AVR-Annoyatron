@@ -14,6 +14,13 @@
 
 #define CUT_WIRES_bm (PIN4_bm | PIN5_bm | PIN6_bm | PIN7_bm)
 
+typedef enum board_state_enum
+{
+   board_state_waiting,
+   board_state_countdown,
+   board_state_cut
+} board_state_t;
+
 void ledUsrBlink(uint8_t count, const int blinkPeriodMsec);
 
 
