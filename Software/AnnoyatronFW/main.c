@@ -8,6 +8,7 @@
 #include "main.h"
 #include "I2C.h"
 #include "SevenSeg.h"
+#include "random.h"
 
 #define __DELAY_BACKWARD_COMPATIBLE__
 #include <util/delay.h>
@@ -24,23 +25,36 @@ static void initPIR(void);
 static void initLED(void);
 static void initAudio(void);
 static void initCountdownTimer(void);
+static void initADC(void);
 static bool PIRisTriggered(void);
+static bool wireIsCut(void);
+static bool properWireIsCut(uint8_t inWire);
 
+volatile bool ADCResRdy;
 volatile bool counterRollover;
 volatile uint32_t tcbCount;
 volatile uint8_t prevTcbCount;
 board_state_t boardState;
+uint8_t safeWire;
+
+uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm};
 
 
 int main(void)
 {
+   ADCResRdy = false;
    counterRollover = false;
    boardState = board_state_waiting;
    tcbCount = 10*100;
    initPeripherals();
    sei();
-   ledUsrBlink(3, 500);
    
+   random_init(adcGetSeed());
+   safeWire = (uint8_t) (random() % NUM_CUT_WIRES);      
+   setAllDigits(cut_wire_pos_array[safeWire]);
+   
+   ledUsrBlink(3, 500);
+      
    while(1)
    {
       PORTC.OUT = (PIRisTriggered()) ? PIN2_bm : 0;
@@ -72,20 +86,25 @@ int main(void)
                boardState = board_state_cut;
                counterRollover = false;
                sevenSegBlink(true);
-               setSevenSegValue(0, 0);
-               setSevenSegValue(1, 0);
-               setSevenSegValue(2, 2);
-               setSevenSegValue(3, 0);
-               setSevenSegValue(4, 0);
+               setAllDigits(0);
                writeSevenSeg();
                TCB0.CNT   = 0;
                TCB0.CTRLA = 0;
             }
-            else if ((PORTA.IN & PIN4_bm) == PIN4_bm)
+            else if (wireIsCut())
             {
-               boardState = board_state_cut;
-               sevenSegBlink(true);
-               writeSevenSeg();
+               if (properWireIsCut(safeWire))
+               {
+                  boardState = board_state_cut;
+                  sevenSegBlink(true);
+                  writeSevenSeg();
+               }
+               else
+               {
+                  boardState = board_state_cut;
+                  setAllDigits((PORTA.IN & CUT_WIRES_bm) >> 4);
+                  sevenSegBlink(false);
+               }
             }
             break;
             
@@ -110,10 +129,11 @@ static void initPeripherals(void)
    initCountdownTimer();
    initLED();
    initPIR();
-   initCutWires();
    I2C_init(); 
    initSevenSeg();
+   initADC();
    initAudio();
+   initCutWires();
 }
 
 /**
@@ -195,6 +215,14 @@ static void initLED(void)
    PORTC.DIR |= PIN2_bm;
 }
 
+static void initADC(void)
+{
+   ADC0.MUXPOS = ADC_MUXPOS_AIN1_gc;   
+   ADC0.CTRLA |= ADC_ENABLE_bm;
+   ADC0.INTCTRL = ADC_RESRDY_bm;
+}
+
+
 /**
  *	Return whether PIR sensor digital output is high at this moment
  */
@@ -236,4 +264,5 @@ ISR(TCB0_INT_vect)
       counterRollover = true;
       tcbCount = 10 * 100;
    }
-}
+}ISR(ADC0_RESRDY_vect){   ADC0.INTFLAGS = ADC_RESRDY_bm;   ADC0.CTRLA &= !ADC_ENABLE_bm;
+   ADC0.INTCTRL &= !ADC_RESRDY_bm;   ADCResRdy = true;}bool wireIsCut(void){   return PORTA.IN & CUT_WIRES_bm; // anything > 0 means a wire is cut}bool properWireIsCut(uint8_t inWire){   return  ((PORTA.IN & CUT_WIRES_bm) == cut_wire_pos_array[inWire]);}

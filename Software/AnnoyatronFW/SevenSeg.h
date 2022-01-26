@@ -12,8 +12,8 @@
 #define SEVENSEG_H_
 
 
-#define LEN_NUM_TABLE 18
-static const uint8_t numbertable[LEN_NUM_TABLE] = {
+#define SEVENSEG_TABLE_LEN 18
+static const uint8_t numbertable[SEVENSEG_TABLE_LEN] = {
    0x3F, /* 0 */
    0x06, /* 1 */
    0x5B, /* 2 */
@@ -33,8 +33,8 @@ static const uint8_t numbertable[LEN_NUM_TABLE] = {
    0xFF, /* all on */
    0x00 /* all off */
 };
-#define SEVENSEG_ALL  LEN_NUM_TABLE - 2
-#define SEVENSEG_NONE LEN_NUM_TABLE - 1
+#define SEVENSEG_ALL  SEVENSEG_TABLE_LEN - 2
+#define SEVENSEG_NONE SEVENSEG_TABLE_LEN - 1
 
 #define SEVENSEG_ADDR (0x70 << 1)
 
@@ -73,6 +73,7 @@ void initSevenSeg(void);
 void setSevenSegValue(uint8_t index, uint8_t value);
 void writeSevenSeg(void);
 void sevenSegBlink(bool blinkEnable);
+void setAllDigits(uint8_t value);
 
 
 

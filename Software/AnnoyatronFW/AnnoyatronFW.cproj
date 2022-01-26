@@ -132,6 +132,12 @@
     <Compile Include="main.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="random.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="random.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="SevenSeg.c">
       <SubType>compile</SubType>
     </Compile>
