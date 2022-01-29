@@ -2,7 +2,7 @@
  * SevenSeg.c
  *
  * Created: 1/14/2022 8:49:43 AM
- *  Author: vtrre
+ * Author: Chase E. Stewart for Hidden Layer Design
  */ 
 
 #include "main.h"
@@ -29,6 +29,7 @@ void initSevenSeg(void)
    SetSevenSegConfig(HT16K33_CMD_DIM_LEVEL(0x08));
 
    /* display_buffer is initialized to zero */
+   writeAllDigits(SEVENSEG_NONE);
    writeSevenSeg();
 }
 
@@ -62,13 +63,13 @@ void writeSevenSeg(void)
    }
 }
 
-void sevenSegBlink(bool blinkEnable)
+void sevenSegBlink(uint8_t blinkSpeed)
 {
    uint8_t writeCmdByte = 0;
    uint8_t status = 0;
 
    /* Set blink on or off based on provided boolean */
-   writeCmdByte = (blinkEnable) ? HT16K33_CMD_DISP_ON_BLINK : HT16K33_CMD_DISP_ON_NOBLINK;
+   writeCmdByte = ( _HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | (blinkSpeed & _HT16K33_BLINK_MASK));
    I2C_start(SEVENSEG_ADDR);
    status = I2C_wait_ACK();
    if (0 != status)
@@ -85,7 +86,7 @@ void sevenSegBlink(bool blinkEnable)
    I2C_stop();
 }
 
-void setAllDigits(uint8_t value)
+void writeAllDigits(uint8_t value)
 {
    if (value >= SEVENSEG_TABLE_LEN) return;
    

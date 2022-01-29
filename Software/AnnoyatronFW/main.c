@@ -32,9 +32,10 @@ static bool properWireIsCut(uint8_t inWire);
 
 volatile bool ADCResRdy;
 volatile bool counterRollover;
+volatile uint32_t pirCount;
 volatile uint32_t tcbCount;
 volatile uint8_t prevTcbCount;
-board_state_t boardState;
+volatile board_state_t boardState;
 uint8_t safeWire;
 
 uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm};
@@ -42,6 +43,7 @@ uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm}
 
 int main(void)
 {
+   pirCount = 0;
    ADCResRdy = false;
    counterRollover = false;
    boardState = board_state_waiting;
@@ -51,70 +53,64 @@ int main(void)
    
    random_init(adcGetSeed());
    safeWire = (uint8_t) (random() % NUM_CUT_WIRES);
-   setAllDigits(cut_wire_pos_array[safeWire]);
-   
+   writeAllDigits(safeWire);
+
    ledUsrBlink(3, 500);
-   
+
+   writeAllDigits(SEVENSEG_NONE);   
+   TCB0.CTRLA = TCB_ENABLE_bm;
+
    while(1)
    {
-      PORTC.OUT = (PIRisTriggered()) ? PIN2_bm : 0;
 
       switch(boardState)
       {
          case board_state_waiting:
-         // Waiting for PIR to trigger and send this to countdown
-         
-         if (PIRisTriggered())
-         {
-            TCB0.CTRLA = TCB_ENABLE_bm;
-            boardState = board_state_countdown;
-         }
-         break;
+            // Waiting for PIR to trigger and send this to countdown
+            PORTC.OUT = (PIRisTriggered()) ? PIN2_bm : 0;
+            break;
          
          case board_state_countdown:
-         // Actively update count until wire is cut or counter rolls over
-         
-         setSevenSegValue(0, (tcbCount / 1000) % 10);
-         setSevenSegValue(1, (tcbCount / 100)  % 10);
-         setSevenSegValue(2, 0x02);
-         setSevenSegValue(3, (tcbCount / 10) % 10);
-         setSevenSegValue(4, tcbCount % 10);
-         writeSevenSeg();
-         
-         if (counterRollover)
-         {
-            boardState = board_state_cut;
-            counterRollover = false;
-            sevenSegBlink(true);
-            setAllDigits(0);
+            // Actively update count until wire is cut or counter rolls over
+            setSevenSegValue(0, (tcbCount / 1000) % 10);
+            setSevenSegValue(1, (tcbCount / 100)  % 10);
+            setSevenSegValue(2, 0x02);
+            setSevenSegValue(3, (tcbCount / 10) % 10);
+            setSevenSegValue(4, tcbCount % 10);
             writeSevenSeg();
-            TCB0.CNT   = 0;
-            TCB0.CTRLA = 0;
-         }
-         else if (wireIsCut())
-         {
-            if (properWireIsCut(safeWire))
+         
+            if (counterRollover)
             {
                boardState = board_state_cut;
-               sevenSegBlink(true);
-               writeSevenSeg();
+               counterRollover = false;
+               sevenSegBlink(HT16K33_BLINK_2HZ);
+               writeAllDigits(0);
+               TCB0.CTRLA = 0;
             }
-            else
+            else if (wireIsCut())
             {
-               boardState = board_state_cut;
-               setAllDigits((PORTA.IN & CUT_WIRES_bm) >> 4);
-               sevenSegBlink(false);
+               if (properWireIsCut(safeWire))
+               {
+                  boardState = board_state_cut;
+                  sevenSegBlink(HT16K33_BLINK_2HZ);
+                  writeSevenSeg();
+               }
+               else
+               {
+                  boardState = board_state_cut;
+                  writeAllDigits(0);
+                  sevenSegBlink(HT16K33_BLINK_1HZ);
+               }
             }
-         }
-         break;
+            break;
          
          case board_state_cut:
-         // get stuck forever
-         break;
+            // get stuck forever
+            break;
          
          default:
-         // should never get here!
-         ledUsrBlink(0, 1000);
+            // should never get here!
+            ledUsrBlink(0, 1000);
       }
       prevTcbCount = tcbCount;
    }
@@ -255,14 +251,30 @@ void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
 ISR(TCB0_INT_vect)
 {
    TCB0.INTFLAGS = 1;
-   tcbCount--;
-   if (tcbCount == 0)
+   
+   if (boardState == board_state_countdown)
+   {   
+      tcbCount--;
+      if (tcbCount == 0)
+      {
+         counterRollover = true;
+         tcbCount = 10 * 100;
+      }
+   }      
+   else if (boardState == board_state_waiting)
    {
-      counterRollover = true;
-      tcbCount = 10 * 100;
+      pirCount = (PIRisTriggered()) ? pirCount + 1 : 0;
+      if (pirCount >= 5*100)
+      {
+         PORTC.OUT = 0;
+         boardState = board_state_countdown;
+      }
    }
 }
 
+/**
+ *	ADC interrupt when ADC results are ready to be taken
+ */
 ISR(ADC0_RESRDY_vect)
 {
    ADC0.INTFLAGS = ADC_RESRDY_bm;
@@ -271,12 +283,12 @@ ISR(ADC0_RESRDY_vect)
    ADCResRdy = true;
 }
 
-bool wireIsCut(void)
+static bool wireIsCut(void)
 {
    return PORTA.IN & CUT_WIRES_bm; // anything > 0 means a wire is cut
 }
 
-bool properWireIsCut(uint8_t inWire)
+static bool properWireIsCut(uint8_t inWire)
 {
    return  ((PORTA.IN & CUT_WIRES_bm) == cut_wire_pos_array[inWire]);
 }

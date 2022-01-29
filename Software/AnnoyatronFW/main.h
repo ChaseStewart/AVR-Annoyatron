@@ -2,7 +2,7 @@
  * main.h
  *
  * Created: 12/12/2021 6:23:38 PM
- *  Author: vtrre
+ * Author: Chase E. Stewart for Hidden Layer Design
  */ 
 
 #include "stdbool.h"
@@ -25,6 +25,9 @@ typedef enum board_state_enum
 
 extern volatile bool ADCResRdy;
 
+/**
+ *	Blink the user LED `count` or infinity times at a rate of `blinkPeriodMsec`
+ */
 void ledUsrBlink(uint8_t count, const int blinkPeriodMsec);
 
 
