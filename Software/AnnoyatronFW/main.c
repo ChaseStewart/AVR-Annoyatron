@@ -4,7 +4,7 @@
  * Created: 12/11/2021 2:35:04 PM
  * Author: Chase E. Stewart for Hidden Layer Design
  */
-
+#include "audioArrays.h"
 #include "main.h"
 #include "I2C.h"
 #include "SevenSeg.h"
@@ -30,6 +30,7 @@ static bool PIRisTriggered(void);
 static bool wireIsCut(void);
 static bool properWireIsCut(uint8_t inWire);
 
+volatile uint32_t audioIdx;
 volatile bool ADCResRdy;
 volatile bool counterRollover;
 volatile uint32_t pirCount;
@@ -43,6 +44,7 @@ uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm}
 
 int main(void)
 {
+   audioIdx = 0;
    pirCount = 0;
    ADCResRdy = false;
    counterRollover = false;
@@ -67,7 +69,7 @@ int main(void)
       {
          case board_state_waiting:
             // Waiting for PIR to trigger and send this to countdown
-            PORTC.OUT = (PIRisTriggered()) ? PIN2_bm : 0;
+            PORTC.OUT = (PIRisTriggered()) ? (PIN2_bm | PIN3_bm) : PIN3_bm;
             break;
          
          case board_state_countdown:
@@ -166,19 +168,23 @@ static void initAudio(void)
     *	set Audio ~SHDN pin high
     */
    PORTC.DIRSET = PIN3_bm;
-   PORTC.OUT |= PIN3_bm;
+   PORTC.OUTSET = PIN3_bm;
+
+   /*
+    *	setup underflow interrupt
+    */
+   TCA0.SPLIT.INTCTRL = TCA_SPLIT_HUNF_bm;
+
 
    /*
     *	setup PWM
     */
-   PORTA.DIRSET = PIN3_bm;
-   TCA0.SINGLE.CTRLD &= ~TCA_SPLIT_ENABLE_bm;
-   TCA0.SINGLE.PER = 5000;
-   TCA0.SINGLE.CMP0 = 2500;
-   TCA0.SINGLE.CNT = 0;
-   TCA0.SINGLE.CTRLB |= (TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_CMP0EN_bm); // we want WO3 so set 0b11
-   TCA0.SINGLE.CTRLB |= (TCA_SINGLE_WGMODE0_bm | TCA_SINGLE_WGMODE1_bm); // WGMode 3 == single PWM
-   TCA0.SINGLE.CTRLA = (TCA_SINGLE_CLKSEL_DIV2_gc | TCA_SINGLE_ENABLE_bm); // now enable the module
+   PORTA.DIRSET = PIN3_bm; // Set PWM pin to output
+   TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm; // Enable split mode based on v1.9.9 pinout
+   TCA0.SPLIT.CTRLB |= (TCA_SPLIT_HCMP0EN_bm); // HCMP0 corresponds to our WO3
+   TCA0.SPLIT.HPER  = 0xFF; // use whole 8 bit array
+   TCA0.SPLIT.HCMP0 = 0; // this will be controlled by the audioArray
+   TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc | TCA_SPLIT_ENABLE_bm);
 }
 
 /**
@@ -235,14 +241,14 @@ void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
 
    while (!count || iter < count)
    {
-      PORTC.OUT |= PIN2_bm;
+      PORTC.OUTSET = PIN2_bm;
       _delay_ms(blinkPeriodMsec);
-      PORTC.OUT &= ~PIN2_bm;
+      PORTC.OUTCLR = PIN2_bm;
       _delay_ms(blinkPeriodMsec);
       iter++;
    }
    // clear LED after blinking is done
-   PORTC.OUT &= ~PIN2_bm;
+   PORTC.OUTCLR = PIN2_bm;
 }
 
 /**
@@ -264,11 +270,24 @@ ISR(TCB0_INT_vect)
    else if (boardState == board_state_waiting)
    {
       pirCount = (PIRisTriggered()) ? pirCount + 1 : 0;
-      if (pirCount >= 5*100)
+      if (pirCount >= 350)
       {
-         PORTC.OUT = 0;
+         PORTC.OUTCLR = PIN2_bm;
          boardState = board_state_countdown;
       }
+   }
+}
+
+ISR(TCA0_HUNF_vect)
+{
+   TCA0.SPLIT.INTFLAGS = TCA_SPLIT_HUNF_bm;
+   switch (boardState)
+   {
+      case board_state_countdown:
+         TCA0.SPLIT.HCMP0 = (shortSiren[audioIdx] >> 4);
+         audioIdx = (audioIdx < sizeof(shortSiren)) ? audioIdx + 1 : 0;
+      default:
+         return;
    }
 }
 
