@@ -29,6 +29,8 @@ static void initADC(void);
 static bool PIRisTriggered(void);
 static bool wireIsCut(void);
 static bool properWireIsCut(uint8_t inWire);
+static void setAudioIsEnabled(bool isAudioEnabled);
+
 
 volatile uint32_t audioIdx;
 volatile bool ADCResRdy;
@@ -83,6 +85,7 @@ int main(void)
          
             if (counterRollover)
             {
+               setAudioIsEnabled(false);
                boardState = board_state_cut;
                counterRollover = false;
                sevenSegBlink(HT16K33_BLINK_2HZ);
@@ -91,6 +94,8 @@ int main(void)
             }
             else if (wireIsCut())
             {
+               setAudioIsEnabled(false);
+               
                if (properWireIsCut(safeWire))
                {
                   boardState = board_state_cut;
@@ -168,13 +173,12 @@ static void initAudio(void)
     *	set Audio ~SHDN pin high
     */
    PORTC.DIRSET = PIN3_bm;
-   PORTC.OUTSET = PIN3_bm;
+   setAudioIsEnabled(false);
 
    /*
     *	setup underflow interrupt
     */
    TCA0.SPLIT.INTCTRL = TCA_SPLIT_HUNF_bm;
-
 
    /*
     *	setup PWM
@@ -185,6 +189,21 @@ static void initAudio(void)
    TCA0.SPLIT.HPER  = 0xFF; // use whole 8 bit array
    TCA0.SPLIT.HCMP0 = 0; // this will be controlled by the audioArray
    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc | TCA_SPLIT_ENABLE_bm);
+}
+
+/**
+ *	Set or clear audio output SHDN pin based on provided bool arg
+ */
+static void setAudioIsEnabled(bool isAudioEnabled)
+{
+   if (isAudioEnabled) 
+   {
+      PORTC.OUTSET = PIN3_bm;
+   }   
+   else 
+   {
+      PORTC.OUTCLR = PIN3_bm;   
+   }      
 }
 
 /**
@@ -274,6 +293,7 @@ ISR(TCB0_INT_vect)
       {
          PORTC.OUTCLR = PIN2_bm;
          boardState = board_state_countdown;
+         setAudioIsEnabled(true);   
       }
    }
 }
@@ -284,7 +304,9 @@ ISR(TCA0_HUNF_vect)
    switch (boardState)
    {
       case board_state_countdown:
-         TCA0.SPLIT.HCMP0 = (shortSiren[audioIdx] >> 4);
+         // *** START TODO I know this is working, re-enable when I can make audio quieter!
+         //TCA0.SPLIT.HCMP0 = (shortSiren[audioIdx]);
+         // *** END TODO I know this is working, re-enable when I can make audio quieter!
          audioIdx = (audioIdx < sizeof(shortSiren)) ? audioIdx + 1 : 0;
       default:
          return;
