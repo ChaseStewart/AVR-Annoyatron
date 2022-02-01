@@ -1,5 +1,5 @@
 # AVR-Annoyatron
-Rebuilding an undergrad project to reflect new knowledge and skill
+Rebuilding an undergrad project to reflect new knowledge and skills on a different MCU
 
 # Author
 [Chase E. Stewart](https://chasestewart.co) for [Hidden Layer Design](https://hiddenlayerdesign.com)
@@ -9,7 +9,7 @@ Rebuilding an undergrad project to reflect new knowledge and skill
 
 `/Hardware/Board_Files/...` - Gerber files that can be used to order the circuit board
 
-`/Software/AnnoyatronFW/...` - Firmware for the Annoyatron project, which can be 
+`/Software/AnnoyatronFW/...` - Firmware for the Annoyatron project, in the form of a Microchip Studio project
 
 # Setup Instructions
 
@@ -25,7 +25,7 @@ Rebuilding an undergrad project to reflect new knowledge and skill
 * Set up the custom programming tool in Microchip Studio to suit your configuration 
   - Mine was `pymcuprog write -t uart -d attiny406 -u COM12 -f "$(MSBuildProjectDirectory)\Debug\AnnoyatronFW.hex" -v info -c 57600 --verify`
 * Acquire a Tag-Connect programming tool and connect it to a COM-to-serial USB dongle to do the flashing 
-  - Don't install a battery until you've successfully flashed the code and the board appears to be working over USB power
+  - *NOTE: Don't install a battery until you've successfully flashed the code and the board appears to be working over USB power!!*
 * You will need to use a `pymcuprog` erase command between every flash to make sure your program will be successfully verified
   - Mine was `pymcuprog erase -t uart -u COM12 -d attiny406`
 
