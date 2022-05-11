@@ -71,7 +71,14 @@ int main(void)
       {
          case board_state_waiting:
             // Waiting for PIR to trigger and send this to countdown
-            PORTC.OUT = (PIRisTriggered()) ? (PIN2_bm | PIN3_bm) : PIN3_bm;
+            if (PIRisTriggered())
+            {
+               PORTC.OUTSET = PIN2_bm; 
+            }
+            else
+            {
+               PORTC.OUTCLR = PIN2_bm;               
+            }
             break;
          
          case board_state_countdown:
@@ -165,29 +172,34 @@ static void initCountdownTimer(void)
 
 /**
  *	Setup the TCA0 timer and PWM output to the audio IC
- * Also set the ~SHDN pin high
+ * Also setup the ~SHDN pin 
  */
 static void initAudio(void)
 {
    /*
-    *	set Audio ~SHDN pin high
+    *	set Audio ~SHDN pin to output low for now
     */
-   PORTC.DIRSET = PIN3_bm;
+   PORTB.DIRSET = PIN3_bm;
    setAudioIsEnabled(false);
+
+   /*
+    *	Setup PORTMUX to provide alternate WO1 output
+    */
+   PORTMUX.CTRLC = PORTMUX_TCA01_bm;
 
    /*
     *	setup underflow interrupt
     */
-   TCA0.SPLIT.INTCTRL = TCA_SPLIT_HUNF_bm;
+   TCA0.SPLIT.INTCTRL = TCA_SPLIT_LUNF_bm;
 
    /*
     *	setup PWM
     */
-   PORTA.DIRSET = PIN3_bm; // Set PWM pin to output
+   PORTB.DIRSET = PIN4_bm; // Set PWM pin to output
    TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm; // Enable split mode based on v1.9.9 pinout
-   TCA0.SPLIT.CTRLB |= (TCA_SPLIT_HCMP0EN_bm); // HCMP0 corresponds to our WO3
-   TCA0.SPLIT.HPER  = 0xFF; // use whole 8 bit array
-   TCA0.SPLIT.HCMP0 = 0; // this will be controlled by the audioArray
+   TCA0.SPLIT.CTRLB |= (TCA_SPLIT_LCMP1EN_bm); // LCMP1 corresponds to our WO1
+   TCA0.SPLIT.LPER  = 0xFF; // use whole 8 bit array
+   TCA0.SPLIT.LCMP1 = 0; // this will be controlled by the audioArray
    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc | TCA_SPLIT_ENABLE_bm);
 }
 
@@ -198,11 +210,11 @@ static void setAudioIsEnabled(bool isAudioEnabled)
 {
    if (isAudioEnabled) 
    {
-      PORTC.OUTSET = PIN3_bm;
+      PORTB.OUTSET = PIN3_bm;
    }   
    else 
    {
-      PORTC.OUTCLR = PIN3_bm;   
+      PORTB.OUTCLR = PIN3_bm;   
    }      
 }
 
@@ -232,7 +244,7 @@ static void initCutWires(void)
  */
 static void initLED(void)
 {
-   PORTC.DIR |= PIN2_bm;
+   PORTC.DIRSET = PIN2_bm;
 }
 
 static void initADC(void)
@@ -298,16 +310,14 @@ ISR(TCB0_INT_vect)
    }
 }
 
-ISR(TCA0_HUNF_vect)
+ISR(TCA0_LUNF_vect)
 {
-   TCA0.SPLIT.INTFLAGS = TCA_SPLIT_HUNF_bm;
+   TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
    switch (boardState)
    {
       case board_state_countdown:
-         // *** START TODO I know this is working, re-enable when I can make audio quieter!
-         //TCA0.SPLIT.HCMP0 = (shortSiren[audioIdx]);
-         // *** END TODO I know this is working, re-enable when I can make audio quieter!
-         audioIdx = (audioIdx < sizeof(shortSiren)) ? audioIdx + 1 : 0;
+         TCA0.SPLIT.LCMP1 = (siren[audioIdx]);
+         audioIdx = (audioIdx < sizeof(siren)) ? audioIdx + 1 : 0;
       default:
          return;
    }
