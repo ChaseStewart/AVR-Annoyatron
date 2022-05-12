@@ -1,5 +1,5 @@
-/*
- * SevenSeg.h
+/*!
+ * @file SevenSeg.h
  *
  * Created: 1/14/2022 8:50:13 AM
  * Author: Chase E. Stewart for Hidden Layer Design
@@ -63,18 +63,17 @@ typedef enum sevenseg_digit_enum
 
 #define SEVENSEG_ADDR (0x70 << 1)  ///< The I2C address of the HT16K33 device
 
-#define _HT16K33_SYS_SETUP_ADDR 0x20
-#define _HT16K33_SYS_SETUP_OSC_ON  0x01
-#define _HT16K33_SYS_SETUP_OSC_OFF 0x00
+#define _HT16K33_SYS_SETUP_ADDR 0x20  ///< System setup address to be logical OR'ed with SETUP commands
+#define _HT16K33_SYS_SETUP_OSC_ON  0x01  ///< Setup command to turn HT16K33 internal oscillator ON
+#define _HT16K33_SYS_SETUP_OSC_OFF 0x00  ///< Setup command to turn HT16K33 internal oscillator OFF
 
 /* Public OSC commands*/
-#define HT16K33_CMD_OSC_ENABLE (_HT16K33_SYS_SETUP_ADDR | _HT16K33_SYS_SETUP_OSC_ON)
-#define HT16K33_CMD_OSC_DISABLE (_HT16K33_SYS_SETUP_ADDR | _HT16K33_SYS_SETUP_OSC_OFF)
+#define HT16K33_CMD_OSC_ENABLE (_HT16K33_SYS_SETUP_ADDR | _HT16K33_SYS_SETUP_OSC_ON)  ///< Convenience definition to turn oscillator ON
+#define HT16K33_CMD_OSC_DISABLE (_HT16K33_SYS_SETUP_ADDR | _HT16K33_SYS_SETUP_OSC_OFF)  ///< Convenience definition of command to turn oscillator OFF
 
-#define _HT16K33_DISP_SET_ADDR 0x80
-#define _HT16K33_DISP_SET_DISPLAYON 0x01
-#define _HT16K33_DISP_SET_DISPLAYOFF 0x00
-#define _HT16K33_BLINK_MASK  0x06
+#define _HT16K33_DISP_SET_ADDR 0x80  ///< Display setup address to be logical OR'ed with DISP commands
+#define _HT16K33_DISP_SET_DISPLAYON 0x01  ///< Display command to turn HT16K33 display ON
+#define _HT16K33_DISP_SET_DISPLAYOFF 0x00 ///< Display command to turn HT16K33 display OFF
 
 /** Enumeration of the possible HT16K33 blink values */
 typedef enum sevenseg_blink_enum
@@ -85,43 +84,25 @@ typedef enum sevenseg_blink_enum
 	HT16K33_BLINK_HALFHZ = 0x06
 } sevenseg_blink_t;
 
+#define _HT16K33_BLINK_MASK  0x06 ///< Bitmask for all possible blink options
+
 
 /* Public DISP commands */
-#define HT16K33_CMD_DISP_OFF (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYOFF | HT16K33_BLINK_OFF)
-#define HT16K33_CMD_DISP_ON_NOBLINK (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | HT16K33_BLINK_OFF)
-#define HT16K33_CMD_DISP_ON_BLINK (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | HT16K33_BLINK_2HZ)
+#define HT16K33_CMD_DISP_OFF (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYOFF | HT16K33_BLINK_OFF)  ///< Convenience definition to turn display off
+#define HT16K33_CMD_DISP_ON_NOBLINK (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | HT16K33_BLINK_OFF)  ///< Convenience definition to turn display on without blinking
+#define HT16K33_CMD_DISP_ON_BLINK (_HT16K33_DISP_SET_ADDR | _HT16K33_DISP_SET_DISPLAYON | HT16K33_BLINK_2HZ)  ///< Convenience definition to turn display on blinking at 2HZ
 
-#define _HT16K33_DIM_ADDR 0xE0
+#define _HT16K33_DIM_ADDR 0xE0 ///< Dimming setup address to be logical OR'ed with DIM commands
 
-/*Public DIM commands */
-#define HT16K33_CMD_DIM_LEVEL(dimNibble) (_HT16K33_DIM_ADDR + (dimNibble & 0x0F))
+/** Set dimming level using provided nybble (0x0F is brightest, 0x00 is dimmest) */
+#define HT16K33_CMD_DIM_LEVEL(dimNibble) (_HT16K33_DIM_ADDR + (dimNibble & 0x0F)) 
 
-extern volatile uint8_t display_buffer[5];
+extern volatile uint8_t display_buffer[5];  ///< character buffer for the 4 decimal places and 1 colon place of the display
 
-/**
- *	Setup the SevenSeg display to receive commands and display properly
- */
 void initSevenSeg(void);
-
-/**
- *	Set the buffer for sevenSeg digit `index` to display `value` from the numberTable
- * NOTE: This does not write directly, writeSevenSeg() must be called to print to display
- */
 void setSevenSegValue(uint8_t index, sevenseg_digit_t value);
-
-/** 
- * Print all values in the buffer out onto the sevenSeg display
- */
 void writeSevenSeg(void);
-
-/**
- *	Enable or disable the blink function built into the displays
- */
 void sevenSegBlink(sevenseg_blink_t blinkSpeed);
-
-/**
- *	Set all digits at once to value and then write to display
- */
 void writeAllDigits(sevenseg_digit_t value);
 
 

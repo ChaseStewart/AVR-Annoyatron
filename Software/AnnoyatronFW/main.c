@@ -11,8 +11,8 @@
  *  This code runs on an ATTiny1604- models with less memory 
  *  will not be able to hold the audio arrays
  * 
- * @section author Author 
- * Chase E. Stewart for Hidden Layer Design
+ * @section author Author
+ *  Chase E. Stewart for Hidden Layer Design
  */
 #include "audioArrays.h"
 #include "main.h"
