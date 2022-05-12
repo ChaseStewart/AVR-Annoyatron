@@ -1,16 +1,26 @@
-/**
- * main.c
+/*!
+ * @file main.c
  *
- * Created: 12/11/2021 2:35:04 PM
- * Author: Chase E. Stewart for Hidden Layer Design
+ * @mainpage State machine and initialization code
+ *
+ * @section intro_sec Introduction
+ *  This file implements the main logic of the project, other files 
+ *  provide convenience functions and separate out complexity from this file 
+ *  
+ * @section dependencies Dependencies
+ *  This code runs on an ATTiny1604- models with less memory 
+ *  will not be able to hold the audio arrays
+ * 
+ * @section author Author 
+ * Chase E. Stewart for Hidden Layer Design
  */
 #include "audioArrays.h"
 #include "main.h"
 #include "I2C.h"
 #include "SevenSeg.h"
 #include "random.h"
-
-#define __DELAY_BACKWARD_COMPATIBLE__
+ 
+#define __DELAY_BACKWARD_COMPATIBLE__  //< Required to be defined for delay_msec to work
 #include <util/delay.h>
 #include <stdbool.h>
 #include <xc.h>
@@ -31,19 +41,24 @@ static bool wireIsCut(void);
 static bool properWireIsCut(uint8_t inWire);
 static void setAudioIsEnabled(bool isAudioEnabled);
 
+/* volatile variables */
+volatile uint32_t audioIdx;  ///< Index into playing audio array from audioArrays.h
+volatile bool ADCResRdy;  ///< True if ADC has results for random sample, else False
+volatile bool counterRollover;  ///< True if countdown time has run out, else False
+volatile uint32_t pirCount;  ///< How many times has the PIR sensor consecutively been tripped
+volatile uint32_t tcbCount;  ///< Countdown timer count that is used to set 7 seg display
+volatile uint8_t prevTcbCount;  ///< TODO this is possibly deprecated
+volatile board_state_t boardState; ///< Current state enumeration of state machine
 
-volatile uint32_t audioIdx;
-volatile bool ADCResRdy;
-volatile bool counterRollover;
-volatile uint32_t pirCount;
-volatile uint32_t tcbCount;
-volatile uint8_t prevTcbCount;
-volatile board_state_t boardState;
-uint8_t safeWire;
+/* non-volatile variables */
+uint8_t safeWire;  ///< integer index [0-3] of wire selected to be proper wire
+uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm};  ///< GPIO bitmask for the wires-to-be-cut
 
-uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm};
-
-
+/*!
+ * @brief Perform initializations and then implement state machine
+ * 
+ * @return 0 for success, else failure
+ */
 int main(void)
 {
    audioIdx = 0;
@@ -128,10 +143,15 @@ int main(void)
       }
       prevTcbCount = tcbCount;
    }
+   return 0;
 }
 
-/**
- * Setup all peripherals
+/*!
+ * @brief Setup all peripherals.
+ *
+ * @param None
+ *
+ * @return None
  */
 static void initPeripherals(void)
 {
@@ -146,8 +166,12 @@ static void initPeripherals(void)
    initCutWires();
 }
 
-/**
- *	Setup clock registers
+/*!
+ * @brief Setup clock registers.
+ *
+ * @param None
+ *
+ * @return None
  */
 static void initClocks(void)
 {
@@ -155,9 +179,13 @@ static void initClocks(void)
    CLKCTRL.MCLKCTRLB |= CLKCTRL_PDIV_16X_gc | CLKCTRL_PEN_bm;
 }
 
-/**
- *	Startup the timer to measure centi-seconds
- * Still TODO get CCMP just right
+/*!
+ * @brief Startup the timer to measure centi-seconds.
+ *  Still TODO get CCMP just right
+ *
+ * @param None
+ *
+ * @return None
  */
 static void initCountdownTimer(void)
 {
@@ -170,9 +198,13 @@ static void initCountdownTimer(void)
    TCB0.CTRLA = 0;
 }
 
-/**
- *	Setup the TCA0 timer and PWM output to the audio IC
- * Also setup the ~SHDN pin 
+/*!
+ * @brief Setup the TCA0 timer and PWM output to the audio IC.
+ *  Also setup the ~SHDN pin 
+ *
+ * @param None
+ *
+ * @return None
  */
 static void initAudio(void)
 {
@@ -203,8 +235,13 @@ static void initAudio(void)
    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc | TCA_SPLIT_ENABLE_bm);
 }
 
-/**
- *	Set or clear audio output SHDN pin based on provided bool arg
+/*!
+ * @brief Set or clear audio output SHDN pin based on provided bool arg.
+ * 
+ * @param isAudioEnabled
+ *   Set SHDN pin high if True, else set SHDN pin low
+ * 
+ * @return None
  */
 static void setAudioIsEnabled(bool isAudioEnabled)
 {
@@ -218,8 +255,12 @@ static void setAudioIsEnabled(bool isAudioEnabled)
    }      
 }
 
-/**
- *	Set up the PIR sensor for sensor readings
+/*!
+ * @brief Set up the PIR sensor for sensor readings.
+ *
+ * @param None
+ *
+ * @return None
  */
 static void initPIR(void)
 {
@@ -227,8 +268,12 @@ static void initPIR(void)
    PORTC.PIN0CTRL &= ~PORT_PULLUPEN_bm;
 }
 
-/**
- *	Set up the GPIO for the four cut-wires
+/*!
+ * @brief Set up the GPIO for the four cut-wires.
+ *
+ * @param None
+ *
+ * @return None
  */
 static void initCutWires(void)
 {
@@ -239,14 +284,25 @@ static void initCutWires(void)
    PORTA.PIN7CTRL = PORT_PULLUPEN_bm;
 }
 
-/**
- * Set up the user LED
+/*!
+ * @brief Set up the user LED.
+ *
+ * @param None
+ *
+ * @return None
  */
 static void initLED(void)
 {
    PORTC.DIRSET = PIN2_bm;
 }
 
+/*!
+ * @brief Setup ADC to get random sample.
+ *
+ * @param None
+ *
+ * @return None
+ */
 static void initADC(void)
 {
    ADC0.MUXPOS = ADC_MUXPOS_AIN1_gc;
@@ -254,17 +310,27 @@ static void initADC(void)
    ADC0.INTCTRL = ADC_RESRDY_bm;
 }
 
-/**
- *	Return whether PIR sensor digital output is high at this moment
+/*!
+ * @brief Return whether PIR sensor digital output is high at this moment.
+ * 
+ * @param None
+ * 
+ * @return True if PIR is currently triggered, else False
  */
 static bool PIRisTriggered(void)
 {
    return 0 != (PORTC.IN & PIN0_bm);
 }
 
-/**
- *	Blink usr LED 'count'-many times at a period of 2 * 'blinkPeriodMsec'
+/*!
+ * @brief Blink usr LED 'count'-many times at a period of 2 * 'blinkPeriodMsec'.
  *  NOTE: This is a blocking call!
+ * 
+ * @param count
+ *  The number of times for the LED to blink- set to zero for infinite repetitions
+ *  
+ * @param blinkPeriodMsec
+ *  The period between LED toggles in Msec
  */
 void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
 {
@@ -282,11 +348,17 @@ void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
    PORTC.OUTCLR = PIN2_bm;
 }
 
-/**
- *	Timer Interrupt for countdown timer TCB0
+/*!
+ * @brief Timer Interrupt for countdown timer TCB0.
+ *
+ * @param vect 
+ *  Unused parameter required by interface
+ *
+ * @return None
  */
-ISR(TCB0_INT_vect)
+ISR(TCB0_INT_vect vect)
 {
+   (void) vect;
    TCB0.INTFLAGS = 1;
    
    if (boardState == board_state_countdown)
@@ -310,8 +382,17 @@ ISR(TCB0_INT_vect)
    }
 }
 
-ISR(TCA0_LUNF_vect)
+/*!
+ * @brief TCA interrupt for lower split underflow
+ *
+ * @param vect 
+ *  Unused parameter required by interface
+ * 
+ * @return None
+ */
+ISR(TCA0_LUNF_vect vect)
 {
+   (void) vect;
    TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
    switch (boardState)
    {
@@ -323,23 +404,45 @@ ISR(TCA0_LUNF_vect)
    }
 }
 
-/**
- *	ADC interrupt when ADC results are ready to be taken
+/*!
+ * @brief ADC interrupt when ADC results are ready to be taken.
+ * 
+ * @param vect
+ *  Unused parameter required by interface
+ *
+ * @return None
  */
-ISR(ADC0_RESRDY_vect)
+ISR(ADC0_RESRDY_vect vect)
 {
+   (void) vect;
    ADC0.INTFLAGS = ADC_RESRDY_bm;
    ADC0.CTRLA &= !ADC_ENABLE_bm;
    ADC0.INTCTRL &= !ADC_RESRDY_bm;
    ADCResRdy = true;
 }
 
+/*!
+ * @brief Return whether any wire was cut.
+ *
+ * @param None
+ * 
+ * @return True if any wire has been cut, else False
+ */
 static bool wireIsCut(void)
 {
    return PORTA.IN & CUT_WIRES_bm; // anything > 0 means a wire is cut
 }
 
+/*!
+ * @brief Return whether only the proper wire was cut out of all wires.
+ *
+ * @param inWire
+ *  The current state of cut and un-cut wires
+ *
+ * @return True if only the designated success wire is cut, else false
+ */
 static bool properWireIsCut(uint8_t inWire)
 {
    return  ((PORTA.IN & CUT_WIRES_bm) == cut_wire_pos_array[inWire]);
 }
+

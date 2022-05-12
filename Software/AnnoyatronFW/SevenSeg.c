@@ -1,21 +1,33 @@
-/*
- * SevenSeg.c
+/*!
+ * @file SevenSeg.c
  *
- * Created: 1/14/2022 8:49:43 AM
- * Author: Chase E. Stewart for Hidden Layer Design
+ * @mainpage Helper functions for HT16K33 I2C interface
+ *
+ * @section intro_sec Introduction
+ *  This project uses the <a href="https://www.adafruit.com/product/1002">
+ * Adafruit 7-Segment display with I2C Backpack</a> as the visual interface
+ *  for the countdown timer. Thus, this file and the associated header file
+ *  each govern the interactions with the display
+ *
+ * @section author Author
+ *
+ * Chase E. Stewart for Hidden Layer Design
+ * 
  */ 
 
 #include "main.h"
 #include "SevenSeg.h"
 #include "I2C.h"
 
-volatile uint8_t display_buffer[5] = {0};
+volatile uint8_t display_buffer[5] = {0};   ///< buffer for the four characters and the optional colon
 
 static void SetSevenSegConfig(int configValue);
 
 
-/**
- *	 Use I2C protocol to send init commands to HT16K33 chip in SevenSegment display
+/*!
+ * @brief Use I2C protocol to send init commands to HT16K33 chip in SevenSegment display
+ *
+ * @return None
  */
 void initSevenSeg(void)
 {
@@ -33,9 +45,19 @@ void initSevenSeg(void)
    writeSevenSeg();
 }
 
-/**
- *	Update one of the indices in the display buffer with a new value
+/*!
+ * @brief Update one of the indices in the display buffer with a new value
  * to be written to the SevenSeg display next time writeSevenSeg() is called
+ *
+ * @param index
+ *  Index of the display char to update; 0-1 are the chars before the colon,
+ *  2 is the colon itself,
+ *  3-4 are the chars after the colon
+ *
+ * @param value
+ *  The value to set the provided index to- values are 0-9 or SEVENSEG_ALL or SEVENSEG_NONE
+ *
+ * @return None
  */
 void setSevenSegValue(uint8_t index, uint8_t value)
 {
@@ -52,8 +74,10 @@ void setSevenSegValue(uint8_t index, uint8_t value)
    display_buffer[index] = numbertable[value];
 }
 
-/**
- *	Write all the values currently in the display buffer to the SevenSeg display
+/*!
+ * @brief Write all the values currently in the display buffer to the SevenSeg display.
+ *
+ * @return None
  */
 void writeSevenSeg(void)
 {
@@ -63,6 +87,14 @@ void writeSevenSeg(void)
    }
 }
 
+/*!
+ * @brief Set the display to blink at one of the rates provided 
+ *
+ * @param blinkSpeed
+ *  An enum value to be written to the HT16K33 Blink setting 
+ *
+ * @return None
+ */
 void sevenSegBlink(uint8_t blinkSpeed)
 {
    uint8_t writeCmdByte = 0;
@@ -86,6 +118,14 @@ void sevenSegBlink(uint8_t blinkSpeed)
    I2C_stop();
 }
 
+/*!
+ * @brief Set the display to blink at one of the rates provided 
+ *
+ * @param value
+ *  An enum value to be written to all digit places
+ *
+ * @return None
+ */
 void writeAllDigits(uint8_t value)
 {
    if (value >= SEVENSEG_TABLE_LEN) return;
@@ -99,6 +139,14 @@ void writeAllDigits(uint8_t value)
    
 }
 
+/*!
+ * @brief Set a single config value in the HT16K33 
+ *
+ * @param configValue
+ *  A single configuration value to set on HT16K33- see documentation for examples
+ *
+ * @return None
+ */
 static void SetSevenSegConfig(int configValue)
 {
    uint8_t writeCmdByte = configValue;
