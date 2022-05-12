@@ -51,7 +51,7 @@ uint16_t random(void)
 }
 
 /*!
- * @brief Use the ATTiny1604 ADC to get a random seed to use in random_init.
+ * @brief Use the ATTiny1606 ADC to get a random seed to use in random_init.
  *
  * @return random seed as uint16_t
  */

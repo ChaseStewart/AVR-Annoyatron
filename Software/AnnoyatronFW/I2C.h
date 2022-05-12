@@ -49,7 +49,7 @@
 #define TWI0_BAUD(F_SCL, T_RISE)                                                                                       \
 ((((((float)20000000.0 / (float)F_SCL)) - 10 - ((float)20000000.0 * T_RISE / 1000000))) / 2)
 
-extern uint8_t timeout_cnt;  ///< count number of conseuctive timeouts 
+extern uint8_t timeout_cnt; 
 
 // device addresses are 8 bit, LSB set if read
 // status returned from I2C transaction:

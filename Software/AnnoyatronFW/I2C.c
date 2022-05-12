@@ -47,7 +47,7 @@
 uint8_t timeout_cnt = 0; ///< count of consecutive timeouts
 
 /*!
- * @brief set up I2C for ATTiny1604.
+ * @brief set up I2C for ATTiny1606.
  *
  * @return None
  */

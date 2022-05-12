@@ -97,8 +97,7 @@ typedef enum sevenseg_blink_enum
 /** Set dimming level using provided nybble (0x0F is brightest, 0x00 is dimmest) */
 #define HT16K33_CMD_DIM_LEVEL(dimNibble) (_HT16K33_DIM_ADDR + (dimNibble & 0x0F)) 
 
-extern volatile uint8_t display_buffer[5];  ///< character buffer for the 4 decimal places and 1 colon place of the display
-
+extern volatile uint8_t display_buffer[5]; 
 void initSevenSeg(void);
 void setSevenSegValue(uint8_t index, sevenseg_digit_t value);
 void writeSevenSeg(void);

@@ -1,18 +1,31 @@
 /*!
  * @file main.c
  *
- * @mainpage State machine and initialization code
+ * @mainpage Annoyatron v2.0 Firmware
  *
  * @section intro_sec Introduction
- *  This file implements the main logic of the project, other files 
- *  provide convenience functions and separate out complexity from this file 
+ *  This documentation describes firmware for an AVR ATTiny1606 on a custom-designed PCB to become a James Bond movie prop. 
+ *  On boot, A PIR sensor is used to detect motion nearby. When motion is detected, a timer counts down and a sound begins to play.
+ *  The user is presented with four wires to cut- cutting the right one before the timer hits zero will play the success noise, and cutting any other wire or letting
+ *  the timer fully count down without cutting any wires at all will play the failure noise. Either way, the success or failure state each play a one-shot noise,
+ *  and then put the MCU in sleep mode until it is reset. 
+ *
+ * @section history History
+ *  This project recreates an undergraduate project at Rice University in 2013-2014. 
+ *  The midterm group project for ELEC 327 required designing and building an embedded system based on the Texas Instruments MSP430
+ *  and some amount of sensors and/or actuators. We wound up creating what we described as a "James Bond movie prop", and with only a few fly-wires
+ *  managed to get it working well enough to pick up an A grade. Despite my enthusiasm and hard work, my partner was much more experienced in PCB design
+ *  and very good at software to boot- so honestly I could not at the time have gotten the project to work by myself. I wanted to redesign the project around a
+ *  more modern microcontroller, and to do a solo implementation of the PCB now that I am able, adding some improvements along the way.
  *  
  * @section dependencies Dependencies
- *  This code runs on an ATTiny1604- models with less memory 
- *  will not be able to hold the audio arrays
+ *  The project file for this code is for Microchip Studio (based on the Eclipse IDE), which you can get from <a href="microchip.com/en-us/tools-resources/develop/microchip-studio">Microchip's website</a>.
+ *  This code runs on an ATTiny1606- ATTiny models with less memory than 16K will not be able to hold the audio arrays.
+ *  You will need Python3 and `pymcuprog` to actually flash the MCU with the compiled code.
+ *  PCB setup, assembly, and connectivity to your computer is left as an exercise to the reader ;)
  * 
  * @section author Author
- *  Chase E. Stewart for Hidden Layer Design
+ *  Chase E. Stewart for <a href="https://www.hiddenlayerdesign.com">Hidden Layer Design</a>
  */
 #include "audioArrays.h"
 #include "main.h"
@@ -54,6 +67,7 @@ volatile board_state_t boardState; ///< Current state enumeration of state machi
 /* non-volatile variables */
 uint8_t safeWire;  ///< integer index [0-3] of wire selected to be proper wire
 uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm};  ///< GPIO bitmask for the wires-to-be-cut
+
 
 /*!
  * @brief Perform initializations and then implement state machine
@@ -386,6 +400,12 @@ void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
 }
 
 /*!
+ * @defgroup ISRs
+ * Interrupt service routines with custom handlers for this project
+ */
+
+/*!
+ * @ingroup ISRs
  * @brief Timer Interrupt for countdown timer TCB0.
  *
  * @param TCB0_INT_vect 
@@ -419,7 +439,8 @@ ISR(TCB0_INT_vect)
 }
 
 /*!
- * @brief TCA interrupt for lower split underflow
+ * @ingroup ISRs
+ * @brief TCA interrupt for PWM timer, to load next audio sample into compare register.
  *
  * @param TCA0_LUNF_vect 
  *  Unused parameter required by interface
@@ -451,6 +472,7 @@ ISR(TCA0_LUNF_vect)
 }
 
 /*!
+ * @ingroup ISRs
  * @brief ADC interrupt when ADC results are ready to be taken.
  * 
  * @param ADC0_RESRDY_vect
