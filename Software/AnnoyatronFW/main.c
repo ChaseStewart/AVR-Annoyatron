@@ -1,8 +1,18 @@
 /*!
  * @file main.c
  *
- * Created: 12/11/2021 2:35:04 PM
- * Author: Chase E. Stewart for Hidden Layer Design
+ * @mainpage State machine and initialization code
+ *
+ * @section intro_sec Introduction
+ *  This file implements the main logic of the project, other files 
+ *  provide convenience functions and separate out complexity from this file 
+ *  
+ * @section dependencies Dependencies
+ *  This code runs on an ATTiny1604- models with less memory 
+ *  will not be able to hold the audio arrays
+ * 
+ * @section author Author 
+ * Chase E. Stewart for Hidden Layer Design
  */
 #include "audioArrays.h"
 #include "main.h"
