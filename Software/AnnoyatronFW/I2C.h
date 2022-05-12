@@ -1,9 +1,8 @@
-/*
- * I2C.h
+/*!
+ * @file I2C.h
  *
  * I2C Master
  *
- * Created: 10/05/2019
  * Author: Dieter Reinhardt
  *
  * Tested with Alternate Pinout
@@ -41,16 +40,16 @@
 #ifndef I2C_H_
 #define I2C_H_
 
-#define ADDR_TIMEOUT	5			// 5 ms timeout
-#define READ_TIMEOUT	5
-#define WRITE_TIMEOUT	5
-#define MAX_LEN			8			// maximum number of bytes for read/write transaction
+#define ADDR_TIMEOUT	5  ///< 5 ms address timeout
+#define READ_TIMEOUT	5  ///< 5 ms read timeout
+#define WRITE_TIMEOUT	5  ///< 5 ms write timeout
+#define MAX_LEN			8  ///< maximum number of bytes for read/write transaction
 
-
+/** Determine BAUD rate from clock freq and rise time */
 #define TWI0_BAUD(F_SCL, T_RISE)                                                                                       \
 ((((((float)20000000.0 / (float)F_SCL)) - 10 - ((float)20000000.0 * T_RISE / 1000000))) / 2)
 
-extern uint8_t timeout_cnt;
+extern uint8_t timeout_cnt; 
 
 // device addresses are 8 bit, LSB set if read
 // status returned from I2C transaction:

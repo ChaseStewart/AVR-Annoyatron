@@ -1,9 +1,6 @@
-/*
- * I2C.c
+/*!
+ * @file I2C.c
  *
- * I2C Master
- *
- * Created: 10/05/2019
  * Author: Dieter Reinhardt
  *
  * Tested with Alternate Pinout
@@ -45,10 +42,15 @@
 
 #include "I2C.h"
 
-#define NOP() asm volatile(" nop \r\n")
+#define NOP() asm volatile(" nop \r\n")  ///< Define a no-op action from assembly
 
-uint8_t timeout_cnt = 0;
+uint8_t timeout_cnt = 0; ///< count of consecutive timeouts
 
+/*!
+ * @brief set up I2C for ATTiny1606.
+ *
+ * @return None
+ */
 void I2C_init(void)
 {
    /* Set PB0 for SCL */
@@ -81,6 +83,11 @@ void I2C_init(void)
 	TWI0.MSTATUS |= (TWI_RIF_bm | TWI_WIF_bm | TWI_BUSERR_bm);		// clear flags	
 }
 
+/*!
+ * @brief get I2C back to a good state after a failure. 
+ *
+ * @return None	
+ */
 void I2C_recover(void)												// clock out I2C bus if in invalid state (e.g. after incomplete transaction)
 {
 	uint8_t	i;
@@ -126,6 +133,14 @@ void I2C_recover(void)												// clock out I2C bus if in invalid state (e.g.
 	TWI0.MSTATUS |= (TWI_RIF_bm | TWI_WIF_bm | TWI_BUSERR_bm);		// clear flags
 }
 
+/*!
+ * @brief Execute the I2C start message
+ * 
+ * @param device_addr
+ *  address of device to be contacted
+ *
+ * @return 0 in all cases
+ */
 uint8_t I2C_start(uint8_t device_addr)								// device_addr LSB set if READ
 {
 	TWI0.MSTATUS |= (TWI_RIF_bm | TWI_WIF_bm);						// clear Read and Write interrupt flags
@@ -134,6 +149,11 @@ uint8_t I2C_start(uint8_t device_addr)								// device_addr LSB set if READ
 	return 0;
 }
 
+/*!
+ * @brief Block until either a timeout occurs or an ACK is received
+ * 
+ * @return 0 if ACK was received, else 0xFF for timeout
+ */
 uint8_t I2C_wait_ACK(void)											// wait for slave response after start of Master Write
 {
 	timeout_cnt = 0;												// reset timeout counter, will be incremented by ms tick interrupt
@@ -151,11 +171,30 @@ uint8_t I2C_wait_ACK(void)											// wait for slave response after start of M
 // the Atmel device documentation mentions a special command for repeated start TWI_MCMD_REPSTART_gc,
 // but this is not used in Atmel's demo code, so we don't use it either
 
+/*!
+ * @brief Execute I2C repeated-start message
+ *
+ * @param device_addr
+ *  The address of the device to be contacted
+ *
+ * @return None
+ */
 void I2C_rep_start(uint8_t device_addr)								// send repeated start, device_addr LSB set if READ
 {
 	TWI0.MADDR = device_addr;	
 }
 
+/*! 
+ * @brief read data into pointer over I2C
+ * 
+ * @param data
+ *  A pointer to a buffer to store read data
+ *
+ * @param ack_flag
+ *  0 means send an ACK after reading, 1 means send a NACK
+ *
+ * @return 0 for success, else 8 for bus contention or 0xFF for timeout
+ */
 uint8_t	I2C_read(uint8_t *data, uint8_t ack_flag)					// read data, ack_flag 0: send ACK, 1: send NACK, returns status
 {
 	timeout_cnt = 0;												// reset timeout counter, will be incremented by ms tick interrupt
@@ -178,6 +217,14 @@ uint8_t	I2C_read(uint8_t *data, uint8_t ack_flag)					// read data, ack_flag 0: 
 	else return 8;													// master does not control bus
 }
 
+/*! 
+ * @brief write data at pointer over I2C
+ * 
+ * @param data
+ *  A pointer to null-terminated data to send
+ *
+ * @return 0 for success, else 8 for bus contention, 0xFF for timeout, 4 for bus error, or 1 for NACK
+ */
 uint8_t I2C_write(uint8_t *data)									// write data, return status
 {
 	timeout_cnt = 0;												// reset timeout counter, will be incremented by ms tick interrupt
@@ -195,18 +242,33 @@ uint8_t I2C_write(uint8_t *data)									// write data, return status
 	else return 8;													// master does not control bus
 }
 
+/*!
+ * @brief Execute the stop I2C message
+ *
+ * @return None
+ */
 void I2C_stop()
 {
 	TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
 }
 
-// read/write multiple bytes (maximum number of bytes MAX_LEN)
-// slave device address 8 bit (LSB = 0)
-// simple error processing, on error master will be reset and error status = 1 returned
-// addr_ptr		address of first array element to transfer
-// slave reg	starting slave register
-// num_bytes	number of bytes to transfer
-
+/*! 
+ * @brief Convenience function to read several bytes from an address on a specified device
+ * 
+ * @param slave_addr
+ *  Address of the device to be read from
+ *
+ * @param addr_ptr
+ *  pointer to the buffer where read bytes should be received
+ *
+ * @param slave_reg
+ *  register on device to be read from
+ *
+ * @param num_bytes
+ *  the number of bytes to read
+ *
+ * @return 0 for success, else 0xFF for timeout or 1 for NACK
+ */
 uint8_t	I2C_read_bytes(uint8_t slave_addr, uint8_t *addr_ptr, uint8_t slave_reg, uint8_t num_bytes)
 {
 	uint8_t status;
@@ -238,6 +300,23 @@ error:
 	return 0xff;													// flag error
 }
 
+/*! 
+ * @brief Convenience function to write several bytes to an address on a specified device
+ * 
+ * @param slave_addr
+ *  Address of the device to be written to
+ *
+ * @param addr_ptr
+ *  pointer to the buffer of bytes to be written
+ *
+ * @param slave_reg
+ *  register on device to be written to
+ *
+ * @param num_bytes
+ *  the number of bytes to write
+ *
+ * @return 0 for success, else 0xFF for timeout or 1 for NACK
+ */
 uint8_t	I2C_write_bytes(uint8_t slave_addr, uint8_t *addr_ptr, uint8_t slave_reg, uint8_t num_bytes)
 {
 	uint8_t status;
