@@ -37,7 +37,7 @@ void initSevenSeg(void)
  *	Update one of the indices in the display buffer with a new value
  * to be written to the SevenSeg display next time writeSevenSeg() is called
  */
-void setSevenSegValue(uint8_t index, uint8_t value)
+void setSevenSegValue(uint8_t index, sevenseg_digit_t value)
 {
    if ( index > 5 || value > SEVENSEG_TABLE_LEN) return;
 
@@ -63,7 +63,7 @@ void writeSevenSeg(void)
    }
 }
 
-void sevenSegBlink(uint8_t blinkSpeed)
+void sevenSegBlink(sevenseg_blink_t blinkSpeed)
 {
    uint8_t writeCmdByte = 0;
    uint8_t status = 0;
@@ -86,7 +86,7 @@ void sevenSegBlink(uint8_t blinkSpeed)
    I2C_stop();
 }
 
-void writeAllDigits(uint8_t value)
+void writeAllDigits(sevenseg_digit_t value)
 {
    if (value >= SEVENSEG_TABLE_LEN) return;
    
