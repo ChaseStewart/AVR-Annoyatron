@@ -1,4 +1,7 @@
 # AVR-Annoyatron
+[Doxygen Documentation for project software](https://chasestewart.github.io/AVR-Annoyatron/)
+
+
 Rebuilding an undergrad embedded systems final project to reflect new knowledge and skills on a different MCU
 
 <img src="https://raw.githubusercontent.com/ChaseStewart/AVR-Annoyatron/main/Hardware/Images/Annoyatron_v2_board.png" width="50%" height="50%">
