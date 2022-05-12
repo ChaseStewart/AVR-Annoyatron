@@ -59,7 +59,7 @@ void initSevenSeg(void)
  *
  * @return None
  */
-void setSevenSegValue(uint8_t index, uint8_t value)
+void setSevenSegValue(uint8_t index, sevenseg_digit_t value)
 {
    if ( index > 5 || value > SEVENSEG_TABLE_LEN) return;
 
@@ -86,6 +86,7 @@ void writeSevenSeg(void)
       I2C_write_bytes(SEVENSEG_ADDR, &display_buffer[i], i * 2, 1);
    }
 }
+
 
 /*!
  * @brief Set the display to blink at one of the rates provided 
@@ -117,6 +118,7 @@ void sevenSegBlink(uint8_t blinkSpeed)
    }
    I2C_stop();
 }
+
 
 /*!
  * @brief Set the display to blink at one of the rates provided 

@@ -26,6 +26,7 @@
 #include <xc.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
 
 /* static functions */
 static void initPeripherals(void);
@@ -84,7 +85,24 @@ int main(void)
 
       switch(boardState)
       {
+		 case board_state_wire_setup:
+			// waiting for the wires to be plugged in
+			if (!wireIsCut())
+			{
+			   boardState = board_state_waiting;
+               sevenSegBlink(HT16K33_BLINK_OFF);
+               writeAllDigits(SEVENSEG_NONE);
+			}
          case board_state_waiting:
+		    if (wireIsCut())
+			{
+               sevenSegBlink(HT16K33_BLINK_1HZ);
+               writeAllDigits(SEVENSEG_DASH);
+			   boardState = board_state_wire_setup;
+               PORTC.OUTCLR = PIN2_bm;			   
+			   break;
+			}
+		 
             // Waiting for PIR to trigger and send this to countdown
             if (PIRisTriggered())
             {
@@ -107,36 +125,55 @@ int main(void)
          
             if (counterRollover)
             {
-               setAudioIsEnabled(false);
-               boardState = board_state_cut;
+			   audioIdx = 0;
+               boardState = board_state_failure;
                counterRollover = false;
                sevenSegBlink(HT16K33_BLINK_2HZ);
                writeAllDigits(0);
                TCB0.CTRLA = 0;
             }
             else if (wireIsCut())
-            {
-               setAudioIsEnabled(false);
-               
+            {             
                if (properWireIsCut(safeWire))
                {
-                  boardState = board_state_cut;
+				  audioIdx = 0;
+                  boardState = board_state_success;
                   sevenSegBlink(HT16K33_BLINK_2HZ);
                   writeSevenSeg();
                }
                else
                {
-                  boardState = board_state_cut;
+				  audioIdx = 0;
+                  boardState = board_state_failure;
                   writeAllDigits(0);
-                  sevenSegBlink(HT16K33_BLINK_1HZ);
+                  sevenSegBlink(HT16K33_BLINK_2HZ);
                }
             }
             break;
          
-         case board_state_cut:
-            // get stuck forever
+         case board_state_failure:
+		    if (audioIdx >= sizeof(goodbye))
+			{
+				setAudioIsEnabled(false);
+				boardState = board_state_done;
+				PORTC.OUTCLR = PIN2_bm;
+			}
             break;
-         
+			
+		case board_state_success:
+		    if (audioIdx >= sizeof(shutdown))
+		    {
+			    setAudioIsEnabled(false);
+			    boardState = board_state_done;
+			    PORTC.OUTCLR = PIN2_bm;
+		    }
+			break;
+			
+         case board_state_done:
+		    // get stuck forever
+			sleep_cpu();
+			break;
+		 
          default:
             // should never get here!
             ledUsrBlink(0, 1000);
@@ -232,7 +269,7 @@ static void initAudio(void)
    TCA0.SPLIT.CTRLB |= (TCA_SPLIT_LCMP1EN_bm); // LCMP1 corresponds to our WO1
    TCA0.SPLIT.LPER  = 0xFF; // use whole 8 bit array
    TCA0.SPLIT.LCMP1 = 0; // this will be controlled by the audioArray
-   TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV16_gc | TCA_SPLIT_ENABLE_bm);
+   TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV2_gc | TCA_SPLIT_ENABLE_bm);
 }
 
 /*!
@@ -351,14 +388,13 @@ void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
 /*!
  * @brief Timer Interrupt for countdown timer TCB0.
  *
- * @param vect 
+ * @param TCB0_INT_vect 
  *  Unused parameter required by interface
  *
  * @return None
  */
-ISR(TCB0_INT_vect vect)
+ISR(TCB0_INT_vect)
 {
-   (void) vect;
    TCB0.INTFLAGS = 1;
    
    if (boardState == board_state_countdown)
@@ -385,20 +421,30 @@ ISR(TCB0_INT_vect vect)
 /*!
  * @brief TCA interrupt for lower split underflow
  *
- * @param vect 
+ * @param TCA0_LUNF_vect 
  *  Unused parameter required by interface
  * 
  * @return None
  */
-ISR(TCA0_LUNF_vect vect)
+ISR(TCA0_LUNF_vect)
 {
-   (void) vect;
    TCA0.SPLIT.INTFLAGS = TCA_SPLIT_LUNF_bm;
    switch (boardState)
    {
       case board_state_countdown:
          TCA0.SPLIT.LCMP1 = (siren[audioIdx]);
          audioIdx = (audioIdx < sizeof(siren)) ? audioIdx + 1 : 0;
+		 break; 
+	  case board_state_success:
+         TCA0.SPLIT.LCMP1 = (shutdown[audioIdx]);
+         audioIdx = (audioIdx < sizeof(shutdown)) ? audioIdx + 1 : audioIdx;
+	     break;
+		 
+	  case board_state_failure:
+         TCA0.SPLIT.LCMP1 = (goodbye[audioIdx]);
+         audioIdx = (audioIdx < sizeof(goodbye)) ? audioIdx + 1 : audioIdx;
+	     break;
+
       default:
          return;
    }
@@ -407,14 +453,13 @@ ISR(TCA0_LUNF_vect vect)
 /*!
  * @brief ADC interrupt when ADC results are ready to be taken.
  * 
- * @param vect
+ * @param ADC0_RESRDY_vect
  *  Unused parameter required by interface
  *
  * @return None
  */
-ISR(ADC0_RESRDY_vect vect)
+ISR(ADC0_RESRDY_vect)
 {
-   (void) vect;
    ADC0.INTFLAGS = ADC_RESRDY_bm;
    ADC0.CTRLA &= !ADC_ENABLE_bm;
    ADC0.INTCTRL &= !ADC_RESRDY_bm;
