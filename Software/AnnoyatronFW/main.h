@@ -16,6 +16,9 @@
 #define NUM_CUT_WIRES 4  ///< Number of slots for cut wires on the device
 #define CUT_WIRES_bm (PIN4_bm | PIN5_bm | PIN6_bm | PIN7_bm) ///< bit masks for GPIO pins of cut wires
 
+#define BLINK_COUNT_SHORT  5 ///< Duration between toggles for short LED blinks
+#define BLINK_COUNT_LONG  11 ///< Duration between toggles for long LED blinks
+
 /** All of the possible states in the state machine */
 typedef enum board_state_enum
 {
@@ -26,6 +29,20 @@ typedef enum board_state_enum
    board_state_failure,
    board_state_done
 } board_state_t;
+
+/** State machine to hold the blinking pattern for different cut_wires options */
+typedef enum blink_state_enum
+{
+	blink_state_4_high = 8,
+	blink_state_4_low  = 7,
+	blink_state_3_high = 6,
+	blink_state_3_low  = 5,
+	blink_state_2_high = 4,
+	blink_state_2_low  = 3,
+	blink_state_1_high = 2,
+	blink_state_1_low  = 1,
+	blink_state_0      = 0,
+} blink_state_t;
 
 extern volatile bool ADCResRdy;
 
