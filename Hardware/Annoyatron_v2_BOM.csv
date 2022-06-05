@@ -1,28 +1,25 @@
-"Id";"Designator";"Package";"Quantity";"Designation";"Supplier and ref";
-1;"R1";"3386P-1-103TLF";1;"10k";;;
-2;"H4,H3,H2,H1";"MountingHole_3.2mm_M3_ISO14580";4;"MountingHole";;;
-3;"TP_5V0,TP_GND0,TP_3V3";"TestPoint_Keystone_5019_Minature";3;"TestPoint";;;
-4;"BT1";"BAT_BH9VPC";1;"BH9VPC";;;
-5;"U6";"SOP-8_3.9x4.9mm_P1.27mm";1;"PAM8302AAS";;;
-6;"TAG1";"TC2030-IDC-NL";1;"Conn_02x03_Odd_Even";;;
-7;"R5,R3,R2,R10,R9,R7";"R_0603_1608Metric";6;"4.7k";;;
-8;"R12,R11";"R_0603_1608Metric";2;"0";;;
-9;"LED_5V0,LED_3V3,LED_USR1";"LED_0603_1608Metric";3;"LED_SMD";;;
-10;"C8,C6,C7,C5";"C_0805_2012Metric";4;"10uF";;;
-11;"5V0";"TO-252-2";1;"NCP1117-5.0_TO252";;;
-12;"R13";"R_0603_1608Metric";1;"1.8k";;;
-13;"C11";"C_0603_1608Metric";1;"0.022uF";;;
-14;"FB2,FB1";"C_0805_2012Metric";2;"Ferrite_Bead";;;
-15;"C10,C9";"C_0603_1608Metric";2;"220pF";;;
-16;"DISPLAY1";"LED_Backpack";1;"LED_Backpack";;;
-17;"R8,R4";"R_0603_1608Metric";2;"47k";;;
-18;"C4";"C_0805_2012Metric";1;"47uF";;;
-19;"C3,C2,C1";"C_0603_1608Metric";3;"0.1uF";;;
-20;"WIRE_SINK1,WIRE_SRC1";"PinSocket_1x04_P2.54mm_Vertical";2;"Conn_01x04";;;
-21;"PIR1";"4667";1;"PIR-4667";;;
-22;"U3";"SOIC-20W_7.5x12.8mm_P1.27mm";1;"ATtiny406-S";;;
-23;"G1";"HiddenLayerLogo";1;"LOGO";;;
-24;"ON1";"SW_AYZ0102AGRLC";1;"OFF";;;
-25;"J2";"PinSocket_1x02_P2.54mm_Vertical";1;"Conn_01x02";;;
-26;"RST_BTN1";"SW_SPST_TL3305A";1;"SW_Push";;;
-27;"3V3";"TO-252-2";1;"NCP1117-3.3_TO252";;;
+Reference, Quantity, Value,Description, Footprint, Datasheet
+3V3 ,1,NCP1117-3.3_TO252,Linear Regulator 3.3V,Package_TO_SOT_SMD:TO-252-2,http://www.onsemi.com/pub_link/Collateral/NCP1117-D.PDF
+5V0 ,1,NCP1117-5.0_TO252,Linear Regulator 5V,Package_TO_SOT_SMD:TO-252-2,http://www.onsemi.com/pub_link/Collateral/NCP1117-D.PDF
+BT1 ,1,BH9VPC,9V Battery Holder,parts:BAT_BH9VPC,https://www.memoryprotectiondevices.com/datasheets/BH9VPC-datasheet.pdf
+C1 C2 C3 ,3,0.1uF,SMD Capacitor,Capacitor_SMD:C_0603_1608Metric,http://www.passivecomponent.com/wp-content/uploads/datasheet/WTC_MLCC_General_Purpose.pdf
+C4 ,1,47uF,SMD Capacitor,Capacitor_SMD:C_0805_2012Metric,http://www.passivecomponent.com/wp-content/uploads/datasheet/WTC_MLCC_General_Purpose.pdf
+C5 C6 C7 C8 ,4,10uF,SMD Capacitor,Capacitor_SMD:C_0805_2012Metric,http://www.passivecomponent.com/wp-content/uploads/datasheet/WTC_MLCC_General_Purpose.pdf
+C9 C10 ,2,220pF,SMD Capacitor,Capacitor_SMD:C_0603_1608Metric,http://www.passivecomponent.com/wp-content/uploads/datasheet/WTC_MLCC_General_Purpose.pdf
+DISPLAY1 ,1,Adafruit_1002,LED Display Backpack,custom:LED_Backpack,https://cdn-shop.adafruit.com/datasheets/ht16K33v110.pdf
+FB1 FB2 ,2,Ferrite_Bead,SMD Ferrite Bead,Capacitor_SMD:C_0805_2012Metric,https://www.we-online.com/katalog/datasheet/74279207.pdf
+J2 ,1,Conn_01x02,JST Male 01x02 Conn,Connector_PinSocket_2.54mm:PinSocket_1x02_P2.54mm_Vertical,https://www.jst-mfg.com/product/pdf/eng/eEH.pdf
+LED_USR1 LED_3V3 LED_5V0 ,3,LED_SMD,SMD LED,LED_SMD:LED_0603_1608Metric,https://www.we-online.com/katalog/datasheet/150060VS55040.pdf
+ON1 ,1,SW_AYZ0102AGRLC,Switch,parts:SW_AYZ0102AGRLC,https://www.ckswitches.com/media/1431/ayz.pdf
+PIR1 ,1,PIR-4667,PIR Sensor,footprints:4667,https://cdn-shop.adafruit.com/product-files/4667/4667_C15116.pdf
+R1 ,1,10k,Trim Pot 10k,custom:3386P-1-103TLF,https://www.bourns.com/docs/Product-Datasheets/3386.pdf
+R11 R12 ,2,0,SMD Resistor,Resistor_SMD:R_0603_1608Metric,https://www.yageo.com/upload/media/product/productsearch/datasheet/rchip/PYu-RC_Group_51_RoHS_L_11.pdf
+R13 ,1,100k,SMD Resistor,Resistor_SMD:R_0603_1608Metric,https://www.yageo.com/upload/media/product/productsearch/datasheet/rchip/PYu-RC_Group_51_RoHS_L_11.pdf
+R2 R3 R4 R5 R7 R8 R9 R10 ,8,4.7k,SMD Resistor,Resistor_SMD:R_0603_1608Metric,https://www.yageo.com/upload/media/product/productsearch/datasheet/rchip/PYu-RC_Group_51_RoHS_L_11.pdf
+RST_BTN1 ,1,SW_Push,Pushbutton,Button_Switch_SMD:SW_SPST_TL3305A,https://sten-eswitch-13110800-production.s3.amazonaws.com/system/asset/product_line/data_sheet/213/TL3305.pdf
+TAG1 ,1,Conn_02x03_Odd_Even,Tag-Connect 6pin No Legs,custom:TC2030-IDC-NL,https://www.tag-connect.com/wp-content/uploads/bsk-pdf-manager/2019/12/TC2030-IDC-NL-Datasheet-Rev-B.pdf
+TP_GND0 TP_3V3 TP_5V0 ,3,TestPoint,Test Points,TestPoint:TestPoint_Keystone_5019_Minature,https://www.keyelco.com/product-pdf.cfm?p=1357
+U3 ,1,ATtiny1606-S,ATTiny1606 Microcontroller,Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm,http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny806_1606_Data_Sheet_40002029A.pdf
+U6 ,1,PAM8302AAS,IC Class-D Audio Amplifier ,Package_SO:SOP-8_3.9x4.9mm_P1.27mm,https://www.diodes.com/assets/Datasheets/PAM8302A.pdf
+WIRE_SINK1 WIRE_SRC1 ,2,Conn_01x04,Female 01x04 Header Socket,Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical,https://app.adam-tech.com/products/download/data_sheet/203013/rs1-xx-g-data-sheet.pdf
+SPEAKER,1,CDM-20008,Speaker,N/A,https://www.cuidevices.com/product/resource/cdm-20008.pdf
