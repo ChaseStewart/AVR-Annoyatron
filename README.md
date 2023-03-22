@@ -1,5 +1,5 @@
 # AVR-Annoyatron
-[Doxygen Documentation for project software](https://chasestewart.github.io/AVR-Annoyatron/)
+[![Documentation](https://github.com/adafruit/ci-arduino/blob/master/assets/doxygen_badge.svg)](https://chasestewart.github.io/AVR-Annoyatron/)
 
 
 Rebuilding an undergrad embedded systems final project to reflect new knowledge and skills on a different MCU
