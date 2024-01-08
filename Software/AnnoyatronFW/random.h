@@ -2,7 +2,10 @@
  * @file random.h
  *
  * Copyright (c) 2017, ?ukasz Marcin Podkalicki <lpodkalicki@gmail.com>
+ *
  * Lightweight library of 16 bit random number generator based on LFSR.
+ *
+ * Holds definitions and prototypes for the random generator code
  */
 
 #ifndef _RANDOM_H_

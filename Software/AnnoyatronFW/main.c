@@ -26,6 +26,9 @@
  * 
  * @section author Author
  *  Chase E. Stewart for <a href="https://www.hiddenlayerdesign.com">Hidden Layer Design</a>
+ *
+ * @section source_code Source Code 
+ * <a href="https://github.com/ChaseStewart/AVR-Annoyatron">AVR-Annoyatron on GitHub</a>
  */
 #include "audioArrays.h"
 #include "main.h"
@@ -202,6 +205,13 @@ int main(void)
 }
 
 /*!
+ * @defgroup HardwareInit
+ * Functions to initialize the hardware for this project
+ */
+
+/*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup all peripherals.
  *
  * @param None
@@ -222,6 +232,8 @@ static void initPeripherals(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup clock registers.
  *
  * @param None
@@ -235,8 +247,10 @@ static void initClocks(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Startup the timer to measure centi-seconds.
- *  Still TODO get CCMP just right
+ * TODO get CCMP just right, validate with scope
  *
  * @param None
  *
@@ -254,6 +268,8 @@ static void initCountdownTimer(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup the TCA0 timer and PWM output to the audio IC.
  *  Also setup the ~SHDN pin 
  *
@@ -290,27 +306,10 @@ static void initAudio(void)
    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV2_gc | TCA_SPLIT_ENABLE_bm);
 }
 
-/*!
- * @brief Set or clear audio output SHDN pin based on provided bool arg.
- * 
- * @param isAudioEnabled
- *   Set SHDN pin high if True, else set SHDN pin low
- * 
- * @return None
- */
-static void setAudioIsEnabled(bool isAudioEnabled)
-{
-   if (isAudioEnabled) 
-   {
-      PORTB.OUTSET = PIN3_bm;
-   }   
-   else 
-   {
-      PORTB.OUTCLR = PIN3_bm;   
-   }      
-}
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Set up the PIR sensor for sensor readings.
  *
  * @param None
@@ -324,6 +323,8 @@ static void initPIR(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Set up the GPIO for the four cut-wires.
  *
  * @param None
@@ -340,6 +341,8 @@ static void initCutWires(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Set up the user LED.
  *
  * @param None
@@ -352,6 +355,8 @@ static void initLED(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup ADC to get random sample.
  *
  * @param None
@@ -363,44 +368,6 @@ static void initADC(void)
    ADC0.MUXPOS = ADC_MUXPOS_AIN1_gc;
    ADC0.CTRLA |= ADC_ENABLE_bm;
    ADC0.INTCTRL = ADC_RESRDY_bm;
-}
-
-/*!
- * @brief Return whether PIR sensor digital output is high at this moment.
- * 
- * @param None
- * 
- * @return True if PIR is currently triggered, else False
- */
-static bool PIRisTriggered(void)
-{
-   return 0 != (PORTC.IN & PIN0_bm);
-}
-
-/*!
- * @brief Blink usr LED 'count'-many times at a period of 2 * 'blinkPeriodMsec'.
- *  NOTE: This is a blocking call!
- * 
- * @param count
- *  The number of times for the LED to blink- set to zero for infinite repetitions
- *  
- * @param blinkPeriodMsec
- *  The period between LED toggles in Msec
- */
-void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
-{
-   uint8_t iter=0;
-
-   while (!count || iter < count)
-   {
-      setLed(true);
-      _delay_ms(blinkPeriodMsec);
-      setLed(false);
-      _delay_ms(blinkPeriodMsec);
-      iter++;
-   }
-   // clear LED after blinking is done
-   setLed(false);
 }
 
 /*!
@@ -608,4 +575,62 @@ static void setLed(bool isLedSet)
 	{
 		PORTC.OUTCLR = PIN2_bm;
 	}
+}
+
+/*!
+ * @brief Return whether PIR sensor digital output is high at this moment.
+ * 
+ * @param None
+ * 
+ * @return True if PIR is currently triggered, else False
+ */
+static bool PIRisTriggered(void)
+{
+   return 0 != (PORTC.IN & PIN0_bm);
+}
+
+/*!
+ * @brief Blink usr LED 'count'-many times at a period of 2 * 'blinkPeriodMsec'.
+ *  NOTE: This is a blocking call!
+ * 
+ * @param count
+ *  The number of times for the LED to blink- set to zero for infinite repetitions
+ *  
+ * @param blinkPeriodMsec
+ *  The period between LED toggles in Msec
+ */
+void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
+{
+   uint8_t iter=0;
+
+   while (!count || iter < count)
+   {
+      setLed(true);
+      _delay_ms(blinkPeriodMsec);
+      setLed(false);
+      _delay_ms(blinkPeriodMsec);
+      iter++;
+   }
+   // clear LED after blinking is done
+   setLed(false);
+}
+
+/*!
+ * @brief Set or clear audio output SHDN pin based on provided bool arg.
+ * 
+ * @param isAudioEnabled
+ *   Set SHDN pin high if True, else set SHDN pin low
+ * 
+ * @return None
+ */
+static void setAudioIsEnabled(bool isAudioEnabled)
+{
+   if (isAudioEnabled) 
+   {
+      PORTB.OUTSET = PIN3_bm;
+   }   
+   else 
+   {
+      PORTB.OUTCLR = PIN3_bm;   
+   }      
 }

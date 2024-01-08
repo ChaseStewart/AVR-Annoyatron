@@ -2,7 +2,11 @@
  * @file random.c
  *
  * Copyright (c) 2017, ?ukasz Marcin Podkalicki <lpodkalicki@gmail.com>
+ *
  * Lightweight library of 16 bit random number generator based on LFSR.
+ *
+ * Used in this project to generate the wire-to-cut after being seeded by
+ * an ADC sample on a floating pin
  */
 
 #include <avr/eeprom.h>

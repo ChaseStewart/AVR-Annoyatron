@@ -2,7 +2,10 @@
  * @file main.h
  *
  * Created: 12/12/2021 6:23:38 PM
+ *
  * Author: Chase E. Stewart for Hidden Layer Design
+ *
+ * Contains configuration variables and definitions of shared items
  */ 
 
 #include "stdbool.h"
@@ -22,8 +25,8 @@
 #define PIR_HIGH_COUNT_TO_COUNTDOWN 350 ///< Compare val for pirHighCount until state -> board_state_countdown
 #define PIR_LOW_COUNT_TO_SLEEP 350 ///< Compare val for pirLowCount until state -> board_state_sleep
 
-#define PC0_INTERRUPT  PORTC.INTFLAGS & PIN0_bm
-#define PC0_CLEAR_INTERRUPT_FLAG  PORTC.INTFLAGS |= PIN0_bm
+#define PC0_INTERRUPT  PORTC.INTFLAGS & PIN0_bm  ///< True if the PortC pin0 GPIO interrupt fired
+#define PC0_CLEAR_INTERRUPT_FLAG  PORTC.INTFLAGS |= PIN0_bm  ///< Clear the PortC pin0 interrupt flag bit
 
 /** All of the possible states in the state machine */
 typedef enum board_state_enum

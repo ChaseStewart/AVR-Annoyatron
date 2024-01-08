@@ -2,7 +2,12 @@
  * @file SevenSeg.h
  *
  * Created: 1/14/2022 8:50:13 AM
+ *
  * Author: Chase E. Stewart for Hidden Layer Design
+ *
+ * Definitions, macros, and prototypes needed for controlling the 
+ * <a href="https://cdn-shop.adafruit.com/datasheets/ht16K33v110.pdf">HT16K33</a> over I2C 
+ *
  */ 
 
 #include <stdbool.h>
