@@ -19,10 +19,17 @@
 #define BLINK_COUNT_SHORT  5 ///< Duration between toggles for short LED blinks
 #define BLINK_COUNT_LONG  11 ///< Duration between toggles for long LED blinks
 
+#define PIR_HIGH_COUNT_TO_COUNTDOWN 350 ///< Compare val for pirHighCount until state -> board_state_countdown
+#define PIR_LOW_COUNT_TO_SLEEP 350 ///< Compare val for pirLowCount until state -> board_state_sleep
+
+#define PC0_INTERRUPT  PORTC.INTFLAGS & PIN0_bm
+#define PC0_CLEAR_INTERRUPT_FLAG  PORTC.INTFLAGS |= PIN0_bm
+
 /** All of the possible states in the state machine */
 typedef enum board_state_enum
 {
    board_state_wire_setup,
+   board_state_sleep,
    board_state_waiting,
    board_state_countdown,
    board_state_success,
