@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>AVR-Annoyatron: ISRs</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
@@ -16,9 +17,15 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -30,6 +37,21 @@
    <div id="projectbrief">A silly embedded prop recreating an undergraduate Embedded System Design project</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.svg"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -40,19 +62,7 @@
 var searchBox = new SearchBox("searchBox", "search",'Search','.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -100,12 +110,15 @@ Functions</h2></td></tr>
 <tr class="memitem:gafe939102ff0c528a7fc1e98c46e6176d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ISRs.html#gafe939102ff0c528a7fc1e98c46e6176d">ISR</a> (ADC0_RESRDY_vect)</td></tr>
 <tr class="memdesc:gafe939102ff0c528a7fc1e98c46e6176d"><td class="mdescLeft">&#160;</td><td class="mdescRight">ADC interrupt when ADC results are ready to be taken.  <a href="group__ISRs.html#gafe939102ff0c528a7fc1e98c46e6176d">More...</a><br /></td></tr>
 <tr class="separator:gafe939102ff0c528a7fc1e98c46e6176d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga498aa6d3c05eb0c93268cd2516dc55ca"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ISRs.html#ga498aa6d3c05eb0c93268cd2516dc55ca">ISR</a> (PORTC_PORT_vect)</td></tr>
+<tr class="memdesc:ga498aa6d3c05eb0c93268cd2516dc55ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">GPIO interrupt driven by PIR sensor when in sleep mode.  <a href="group__ISRs.html#ga498aa6d3c05eb0c93268cd2516dc55ca">More...</a><br /></td></tr>
+<tr class="separator:ga498aa6d3c05eb0c93268cd2516dc55ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p >Interrupt service routines with custom handlers for this project </p>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="gafe939102ff0c528a7fc1e98c46e6176d" name="gafe939102ff0c528a7fc1e98c46e6176d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gafe939102ff0c528a7fc1e98c46e6176d">&#9670;&nbsp;</a></span>ISR() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#gafe939102ff0c528a7fc1e98c46e6176d">&#9670;&nbsp;</a></span>ISR() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -131,8 +144,35 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ga498aa6d3c05eb0c93268cd2516dc55ca" name="ga498aa6d3c05eb0c93268cd2516dc55ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga498aa6d3c05eb0c93268cd2516dc55ca">&#9670;&nbsp;</a></span>ISR() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ISR </td>
+          <td>(</td>
+          <td class="paramtype">PORTC_PORT_vect&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>GPIO interrupt driven by PIR sensor when in sleep mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PORTC_PORT_vect</td><td>Unused parameter required by interface</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
+
+</div>
+</div>
 <a id="ga49d4d3bf0cb62ad22c7faca10c17f2a0" name="ga49d4d3bf0cb62ad22c7faca10c17f2a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga49d4d3bf0cb62ad22c7faca10c17f2a0">&#9670;&nbsp;</a></span>ISR() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga49d4d3bf0cb62ad22c7faca10c17f2a0">&#9670;&nbsp;</a></span>ISR() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -159,7 +199,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="ga29e50fc23ee23e00ffa4723197ea4219" name="ga29e50fc23ee23e00ffa4723197ea4219"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga29e50fc23ee23e00ffa4723197ea4219">&#9670;&nbsp;</a></span>ISR() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga29e50fc23ee23e00ffa4723197ea4219">&#9670;&nbsp;</a></span>ISR() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -182,6 +222,8 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
+<p >start counting towards the configured amount of PIR detects until proceeding to countdown mode</p>
+<p >start counting towards the separately configured amount of PIR non-detects until proceeding to PWR_DOWN sleep mode</p>
 
 </div>
 </div>

@@ -29,12 +29,13 @@ var NAVTREE =
       [ "Introduction", "index.html#intro_sec", null ],
       [ "History", "index.html#history", null ],
       [ "Dependencies", "index.html#dependencies", null ],
-      [ "Author", "index.html#author", null ]
+      [ "Author", "index.html#author", null ],
+      [ "Source Code", "index.html#source_code", null ]
     ] ],
     [ "Modules", "modules.html", "modules" ],
     [ "Files", "files.html", [
       [ "File List", "files.html", "files_dup" ],
-      [ "Globals", "globals.html", [
+      [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
         [ "Functions", "globals_func.html", null ],
         [ "Variables", "globals_vars.html", null ],

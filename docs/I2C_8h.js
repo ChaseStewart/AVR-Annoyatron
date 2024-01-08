@@ -5,7 +5,7 @@ var I2C_8h =
     [ "READ_TIMEOUT", "I2C_8h.html#a18e13c9ac88403c42395bb0af487eb2d", null ],
     [ "TWI0_BAUD", "I2C_8h.html#a1f8aff30880315441a28e8e699dcc8a4", null ],
     [ "WRITE_TIMEOUT", "I2C_8h.html#a3af75bd8417b347229705d6d522ad5c3", null ],
-    [ "I2C_init", "I2C_8h.html#adccc4b93233e9f0d3f02101d68e2e0a7", null ],
+    [ "I2C_init", "group__HardwareInit.html#ga9ff51ddf1d325776fef90cce0223772b", null ],
     [ "I2C_read", "I2C_8h.html#a1cec9c96ae50483feed8cb91a849192d", null ],
     [ "I2C_read_bytes", "I2C_8h.html#ad29b919b29ba8b417b2c5c24c628c4d8", null ],
     [ "I2C_recover", "I2C_8h.html#a234a8291d1e6f70b88a97d77aebce371", null ],
