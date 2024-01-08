@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>AVR-Annoyatron: G:/Projects/GitHub/AVR-Annoyatron/Software/AnnoyatronFW/random.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
@@ -16,9 +17,15 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -30,6 +37,21 @@
    <div id="projectbrief">A silly embedded prop recreating an undergraduate Embedded System Design project</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.svg"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -40,19 +62,7 @@
 var searchBox = new SearchBox("searchBox", "search",'Search','.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -84,7 +94,8 @@ $(document).ready(function(){initNavTree('random_8c.html',''); initResizable(); 
 
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">random.c File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -107,6 +118,9 @@ Include dependency graph for random.c:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a04a07c767031bd88aed9c86c08189e7b"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="random_8c.html#a04a07c767031bd88aed9c86c08189e7b">lfsr16_next</a> (uint16_t n)</td></tr>
+<tr class="memdesc:a04a07c767031bd88aed9c86c08189e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">return next LFSR value  <a href="random_8c.html#a04a07c767031bd88aed9c86c08189e7b">More...</a><br /></td></tr>
+<tr class="separator:a04a07c767031bd88aed9c86c08189e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12c8833260342e384b1f8b7ff5358601"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="random_8c.html#a12c8833260342e384b1f8b7ff5358601">random_init</a> (uint16_t seed)</td></tr>
 <tr class="memdesc:a12c8833260342e384b1f8b7ff5358601"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the random generator.  <a href="random_8c.html#a12c8833260342e384b1f8b7ff5358601">More...</a><br /></td></tr>
 <tr class="separator:a12c8833260342e384b1f8b7ff5358601"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,9 +130,18 @@ Functions</h2></td></tr>
 <tr class="memitem:adab9ac3d232d43fc8418a81eebd48935"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="random_8c.html#adab9ac3d232d43fc8418a81eebd48935">adcGetSeed</a> (void)</td></tr>
 <tr class="memdesc:adab9ac3d232d43fc8418a81eebd48935"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use the ATTiny1606 ADC to get a random seed to use in random_init.  <a href="random_8c.html#adab9ac3d232d43fc8418a81eebd48935">More...</a><br /></td></tr>
 <tr class="separator:adab9ac3d232d43fc8418a81eebd48935"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:adedd2660f12f0d73442ce822478b73cf"><td class="memItemLeft" align="right" valign="top"><a id="adedd2660f12f0d73442ce822478b73cf" name="adedd2660f12f0d73442ce822478b73cf"></a>
+static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>random_number</b> = 0</td></tr>
+<tr class="memdesc:adedd2660f12f0d73442ce822478b73cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returned random number. <br /></td></tr>
+<tr class="separator:adedd2660f12f0d73442ce822478b73cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Copyright (c) 2017, ?ukasz Marcin Podkalicki <a href="#" onclick="location.href='mai'+'lto:'+'lpo'+'dk'+'ali'+'ck'+'i@g'+'ma'+'il.'+'co'+'m'; return false;">lpodk<span class="obfuscator">.nosp@m.</span>alic<span class="obfuscator">.nosp@m.</span>ki@gm<span class="obfuscator">.nosp@m.</span>ail.<span class="obfuscator">.nosp@m.</span>com</a> Lightweight library of 16 bit random number generator based on LFSR. </p>
+<div class="textblock"><p >Copyright (c) 2017, ?ukasz Marcin Podkalicki <a href="#" onclick="location.href='mai'+'lto:'+'lpo'+'dk'+'ali'+'ck'+'i@g'+'ma'+'il.'+'co'+'m'; return false;">lpodk<span class="obfuscator">.nosp@m.</span>alic<span class="obfuscator">.nosp@m.</span>ki@gm<span class="obfuscator">.nosp@m.</span>ail.<span class="obfuscator">.nosp@m.</span>com</a></p>
+<p >Lightweight library of 16 bit random number generator based on LFSR.</p>
+<p >Used in this project to generate the wire-to-cut after being seeded by an ADC sample on a floating pin </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="adab9ac3d232d43fc8418a81eebd48935" name="adab9ac3d232d43fc8418a81eebd48935"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adab9ac3d232d43fc8418a81eebd48935">&#9670;&nbsp;</a></span>adcGetSeed()</h2>
@@ -138,6 +161,41 @@ Functions</h2></td></tr>
 
 <p>Use the ATTiny1606 ADC to get a random seed to use in random_init. </p>
 <dl class="section return"><dt>Returns</dt><dd>random seed as uint16_t </dd></dl>
+
+</div>
+</div>
+<a id="a04a07c767031bd88aed9c86c08189e7b" name="a04a07c767031bd88aed9c86c08189e7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04a07c767031bd88aed9c86c08189e7b">&#9670;&nbsp;</a></span>lfsr16_next()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint16_t lfsr16_next </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>return next LFSR value </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>the current LFSR-returned value</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>next uint16_t LFSR value </dd></dl>
 
 </div>
 </div>

@@ -45,8 +45,9 @@ var SevenSeg_8h =
       [ "SEVENSEG_NONE", "SevenSeg_8h.html#a63000f99006a93337e1236a9425aeb66a79a3c6a888ea0c33a080d69b67ec141f", null ],
       [ "SEVENSEG_DASH", "SevenSeg_8h.html#a63000f99006a93337e1236a9425aeb66a617e88a6fcc413edeb9edb9f1f65ae54", null ]
     ] ],
-    [ "initSevenSeg", "SevenSeg_8h.html#aea8ab51a7b4d848e1fffdc3d0f517a7a", null ],
+    [ "initSevenSeg", "group__HardwareInit.html#gaea8ab51a7b4d848e1fffdc3d0f517a7a", null ],
     [ "setSevenSegValue", "SevenSeg_8h.html#a19ca8c7ca70fffb204b19c41373c24fd", null ],
     [ "writeSevenSeg", "SevenSeg_8h.html#ad16c3a2d8f8166adbf10f62015c3fcdc", null ],
-    [ "display_buffer", "SevenSeg_8h.html#a450655b9c02407f34b02d85036d6716a", null ]
+    [ "display_buffer", "SevenSeg_8h.html#a450655b9c02407f34b02d85036d6716a", null ],
+    [ "numbertable", "SevenSeg_8h.html#a14d471d3a90c2c9ee6a40c7448900121", null ]
 ];

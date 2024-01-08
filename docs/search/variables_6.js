@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['safewire_0',['safeWire',['../main_8c.html#ae5fc6f04ecfcd117cda50c2b3e25d392',1,'main.c']]],
-  ['shutdown_1',['shutdown',['../audioArrays_8h.html#a179d510b0fee17cbd9bf6cce90b0d721',1,'audioArrays.h']]],
-  ['siren_2',['siren',['../audioArrays_8h.html#a8de2179d35262920de67ddec7a6545ae',1,'audioArrays.h']]]
+  ['pirhighcount_0',['pirHighCount',['../main_8c.html#a57d75811d08de969797a4e69d187f1ac',1,'main.c']]],
+  ['pirlowcount_1',['pirLowCount',['../main_8c.html#a3cf4d6b37c37bf6b74cc68f837001a55',1,'main.c']]]
 ];

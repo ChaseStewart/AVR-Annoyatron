@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['random_0',['random',['../random_8c.html#a094c4236495f559be7f85324190263da',1,'random(void):&#160;random.c'],['../random_8h.html#a094c4236495f559be7f85324190263da',1,'random(void):&#160;random.c']]],
-  ['random_5finit_1',['random_init',['../random_8c.html#a12c8833260342e384b1f8b7ff5358601',1,'random_init(uint16_t seed):&#160;random.c'],['../random_8h.html#a12c8833260342e384b1f8b7ff5358601',1,'random_init(uint16_t seed):&#160;random.c']]]
+  ['piristriggered_0',['PIRisTriggered',['../main_8c.html#a27708c4512809ca9428e60fce84c7174',1,'main.c']]],
+  ['properwireiscut_1',['properWireIsCut',['../main_8c.html#ae975e9fee3b75a81802a6006820b2183',1,'main.c']]]
 ];
