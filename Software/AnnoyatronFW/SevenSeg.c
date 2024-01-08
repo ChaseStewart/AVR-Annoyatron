@@ -1,18 +1,13 @@
 /*!
  * @file SevenSeg.c
  *
- * @mainpage Helper functions for HT16K33 I2C interface
+ * Helper functions for HT16K33 I2C interface
  *
- * @section intro_sec Introduction
- *  This project uses the <a href="https://www.adafruit.com/product/1002">
+ * This project uses the <a href="https://www.adafruit.com/product/1002">
  * Adafruit 7-Segment display with I2C Backpack</a> as the visual interface
  *  for the countdown timer. Thus, this file and the associated header file
  *  each govern the interactions with the display
  *
- * @section author Author
- *
- * Chase E. Stewart for Hidden Layer Design
- * 
  */ 
 
 #include "main.h"
@@ -25,6 +20,8 @@ static void SetSevenSegConfig(int configValue);
 
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Use I2C protocol to send init commands to HT16K33 chip in SevenSegment display
  *
  * @return None

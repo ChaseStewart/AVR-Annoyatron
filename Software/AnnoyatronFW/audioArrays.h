@@ -2,7 +2,12 @@
  * @file audioArrays.h
  *
  * Created: 1/30/2022 8:32:32 AM
+ *
  * Author: Chase E. Stewart for Hidden Layer Design
+ *
+ * Contains short audio samples in raw 8 bit array format
+ * 
+ * These are very carefully calculated to fit within the memory of the attiny1606 with the existing code  
  */ 
 
 #include "stdint.h"
