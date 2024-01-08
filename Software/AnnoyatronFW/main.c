@@ -89,7 +89,7 @@ int main(void)
    tcbCount = 10*100;
    blinkCount = BLINK_COUNT_SHORT;
    initPeripherals();
-   set_sleep_mode(SLEEP_MODE_STANDBY);
+   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
    sei();
    
    random_init(adcGetSeed());
@@ -119,8 +119,7 @@ int main(void)
 			break;
 			
          case board_state_sleep:
-		    // TODO WOULD ENABLE SLEEP MODE
-			// sleep_mode();
+			sleep_mode();
 		    break;
 		 
          case board_state_waiting:

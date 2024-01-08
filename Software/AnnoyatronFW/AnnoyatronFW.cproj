@@ -55,7 +55,7 @@
       </ToolNumber>
       <ToolName>Custom Programming Tool</ToolName>
     </custom>
-    <CustomProgrammingToolCommand>pymcuprog write -t uart -d attiny1606 -u COM3 -f "$(MSBuildProjectDirectory)\Debug\AnnoyatronFW.hex" -v info -c 57600 --verify</CustomProgrammingToolCommand>
+    <CustomProgrammingToolCommand>pymcuprog write -t uart -d attiny1606 -u COM4 -f "$(MSBuildProjectDirectory)\Debug\AnnoyatronFW.hex" -v info -c 57600 --verify</CustomProgrammingToolCommand>
     <avrtoolinterface />
     <com_atmel_avrdbg_tool_simulator>
       <ToolOptions xmlns="">
