@@ -26,6 +26,9 @@
  * 
  * @section author Author
  *  Chase E. Stewart for <a href="https://www.hiddenlayerdesign.com">Hidden Layer Design</a>
+ *
+ * @section source_code Source Code 
+ * <a href="https://github.com/ChaseStewart/AVR-Annoyatron">AVR-Annoyatron on GitHub</a>
  */
 #include "audioArrays.h"
 #include "main.h"
@@ -54,19 +57,23 @@ static bool PIRisTriggered(void);
 static bool wireIsCut(void);
 static bool properWireIsCut(uint8_t inWire);
 static void setAudioIsEnabled(bool isAudioEnabled);
+static void setLed(bool isLedSet);
 
 /* volatile variables */
 volatile uint32_t audioIdx;  ///< Index into playing audio array from audioArrays.h
 volatile bool ADCResRdy;  ///< True if ADC has results for random sample, else False
 volatile bool counterRollover;  ///< True if countdown time has run out, else False
-volatile uint32_t pirCount;  ///< How many times has the PIR sensor consecutively been tripped
+volatile uint32_t pirHighCount;  ///< How many times has the PIR sensor consecutively been tripped
+volatile uint32_t pirLowCount;  ///< How many times has the PIR sensor consecutively been tripped
 volatile uint32_t tcbCount;  ///< Countdown timer count that is used to set 7 seg display
-volatile uint8_t prevTcbCount;  ///< TODO this is possibly deprecated
 volatile board_state_t boardState; ///< Current state enumeration of state machine
+volatile blink_state_t blinkState;  ///< State machine for blinking LED during countdown
+volatile uint32_t blinkCount;  ///< Actual counter value for nonblocking LED blink
 
 /* non-volatile variables */
 uint8_t safeWire;  ///< integer index [0-3] of wire selected to be proper wire
 uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm};  ///< GPIO bitmask for the wires-to-be-cut
+blink_state_t blinkReloadState[4] = {blink_state_1_high, blink_state_2_high, blink_state_3_high, blink_state_4_high};  ///< Location to restart the blink pattern
 
 
 /*!
@@ -77,17 +84,21 @@ uint8_t cut_wire_pos_array[NUM_CUT_WIRES] = {PIN4_bm, PIN5_bm, PIN6_bm, PIN7_bm}
 int main(void)
 {
    audioIdx = 0;
-   pirCount = 0;
+   pirHighCount = 0;
+   pirLowCount = 0;
    ADCResRdy = false;
    counterRollover = false;
-   boardState = board_state_waiting;
+   boardState = board_state_wire_setup;
    tcbCount = 10*100;
+   blinkCount = BLINK_COUNT_SHORT;
    initPeripherals();
+   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
    sei();
    
    random_init(adcGetSeed());
    safeWire = (uint8_t) (random() % NUM_CUT_WIRES);
-   writeAllDigits(safeWire);
+   blinkState = blinkReloadState[safeWire];
+   writeAllDigits(safeWire + 1);
 
    ledUsrBlink(3, 500);
 
@@ -103,29 +114,25 @@ int main(void)
 			// waiting for the wires to be plugged in
 			if (!wireIsCut())
 			{
-			   boardState = board_state_waiting;
                sevenSegBlink(HT16K33_BLINK_OFF);
                writeAllDigits(SEVENSEG_NONE);
+               boardState = board_state_sleep;
+               PORTC.PIN0CTRL |= PORT_ISC_BOTHEDGES_gc;
 			}
+			break;
+			
+         case board_state_sleep:
+			sleep_mode();
+		    break;
+		 
          case board_state_waiting:
 		    if (wireIsCut())
 			{
                sevenSegBlink(HT16K33_BLINK_1HZ);
                writeAllDigits(SEVENSEG_DASH);
-			   boardState = board_state_wire_setup;
-               PORTC.OUTCLR = PIN2_bm;			   
-			   break;
+               boardState = board_state_wire_setup;
+               setLed(false);
 			}
-		 
-            // Waiting for PIR to trigger and send this to countdown
-            if (PIRisTriggered())
-            {
-               PORTC.OUTSET = PIN2_bm; 
-            }
-            else
-            {
-               PORTC.OUTCLR = PIN2_bm;               
-            }
             break;
          
          case board_state_countdown:
@@ -170,7 +177,7 @@ int main(void)
 			{
 				setAudioIsEnabled(false);
 				boardState = board_state_done;
-				PORTC.OUTCLR = PIN2_bm;
+				setLed(false);
 			}
             break;
 			
@@ -179,25 +186,32 @@ int main(void)
 		    {
 			    setAudioIsEnabled(false);
 			    boardState = board_state_done;
-			    PORTC.OUTCLR = PIN2_bm;
+			    setLed(false);
 		    }
 			break;
 			
          case board_state_done:
 		    // get stuck forever
-			sleep_cpu();
+			sleep_mode();
 			break;
 		 
          default:
             // should never get here!
             ledUsrBlink(0, 1000);
       }
-      prevTcbCount = tcbCount;
    }
+   // should never get here!
    return 0;
 }
 
 /*!
+ * @defgroup HardwareInit
+ * Functions to initialize the hardware for this project
+ */
+
+/*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup all peripherals.
  *
  * @param None
@@ -218,6 +232,8 @@ static void initPeripherals(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup clock registers.
  *
  * @param None
@@ -231,8 +247,10 @@ static void initClocks(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Startup the timer to measure centi-seconds.
- *  Still TODO get CCMP just right
+ * TODO get CCMP just right, validate with scope
  *
  * @param None
  *
@@ -250,6 +268,8 @@ static void initCountdownTimer(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup the TCA0 timer and PWM output to the audio IC.
  *  Also setup the ~SHDN pin 
  *
@@ -286,27 +306,10 @@ static void initAudio(void)
    TCA0.SPLIT.CTRLA = (TCA_SPLIT_CLKSEL_DIV2_gc | TCA_SPLIT_ENABLE_bm);
 }
 
-/*!
- * @brief Set or clear audio output SHDN pin based on provided bool arg.
- * 
- * @param isAudioEnabled
- *   Set SHDN pin high if True, else set SHDN pin low
- * 
- * @return None
- */
-static void setAudioIsEnabled(bool isAudioEnabled)
-{
-   if (isAudioEnabled) 
-   {
-      PORTB.OUTSET = PIN3_bm;
-   }   
-   else 
-   {
-      PORTB.OUTCLR = PIN3_bm;   
-   }      
-}
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Set up the PIR sensor for sensor readings.
  *
  * @param None
@@ -320,6 +323,8 @@ static void initPIR(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Set up the GPIO for the four cut-wires.
  *
  * @param None
@@ -336,6 +341,8 @@ static void initCutWires(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Set up the user LED.
  *
  * @param None
@@ -348,6 +355,8 @@ static void initLED(void)
 }
 
 /*!
+ * @ingroup HardwareInit
+ *
  * @brief Setup ADC to get random sample.
  *
  * @param None
@@ -359,44 +368,6 @@ static void initADC(void)
    ADC0.MUXPOS = ADC_MUXPOS_AIN1_gc;
    ADC0.CTRLA |= ADC_ENABLE_bm;
    ADC0.INTCTRL = ADC_RESRDY_bm;
-}
-
-/*!
- * @brief Return whether PIR sensor digital output is high at this moment.
- * 
- * @param None
- * 
- * @return True if PIR is currently triggered, else False
- */
-static bool PIRisTriggered(void)
-{
-   return 0 != (PORTC.IN & PIN0_bm);
-}
-
-/*!
- * @brief Blink usr LED 'count'-many times at a period of 2 * 'blinkPeriodMsec'.
- *  NOTE: This is a blocking call!
- * 
- * @param count
- *  The number of times for the LED to blink- set to zero for infinite repetitions
- *  
- * @param blinkPeriodMsec
- *  The period between LED toggles in Msec
- */
-void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
-{
-   uint8_t iter=0;
-
-   while (!count || iter < count)
-   {
-      PORTC.OUTSET = PIN2_bm;
-      _delay_ms(blinkPeriodMsec);
-      PORTC.OUTCLR = PIN2_bm;
-      _delay_ms(blinkPeriodMsec);
-      iter++;
-   }
-   // clear LED after blinking is done
-   PORTC.OUTCLR = PIN2_bm;
 }
 
 /*!
@@ -420,6 +391,29 @@ ISR(TCB0_INT_vect)
    if (boardState == board_state_countdown)
    {   
       tcbCount--;
+	  blinkCount--;
+	  
+	  if (!blinkCount)
+	  {
+	    blinkState--;
+		if (blinkState == blink_state_0)
+		{
+			setLed(true);
+			blinkState = blinkReloadState[safeWire];
+			blinkCount = BLINK_COUNT_SHORT;
+		}
+		else if (blinkState == blink_state_1_low)
+		{
+			setLed(false);
+			blinkCount = BLINK_COUNT_LONG;
+		}
+		else
+		{
+			blinkCount = BLINK_COUNT_SHORT;
+			setLed( (blinkState % 2) ? false : true);
+		}
+	  }
+	  
       if (tcbCount == 0)
       {
          counterRollover = true;
@@ -428,13 +422,37 @@ ISR(TCB0_INT_vect)
    }      
    else if (boardState == board_state_waiting)
    {
-      pirCount = (PIRisTriggered()) ? pirCount + 1 : 0;
-      if (pirCount >= 350)
-      {
-         PORTC.OUTCLR = PIN2_bm;
-         boardState = board_state_countdown;
-         setAudioIsEnabled(true);   
-      }
+	  /** 
+	   * start counting towards the configured amount of
+	   * PIR detects until proceeding to countdown mode
+	   */
+	  if (PIRisTriggered())
+	  {
+		  pirHighCount += 1;
+		  pirLowCount = 0;
+		  if (pirHighCount >= PIR_HIGH_COUNT_TO_COUNTDOWN)
+		  {
+			  boardState = board_state_countdown;
+			  setAudioIsEnabled(true);
+			  setLed(false);
+		  }
+	  }
+	  /** 
+	   * start counting towards the separately configured amount of
+	   * PIR non-detects until proceeding to PWR_DOWN sleep mode
+	   */
+	  else
+	  {
+		  pirHighCount = 0;
+		  pirLowCount += 1;		  
+		  if (pirLowCount >= PIR_LOW_COUNT_TO_SLEEP)
+		  {
+			  boardState = board_state_sleep;
+			  setAudioIsEnabled(false);
+			  setLed(false);
+              PORTC.PIN0CTRL |= PORT_ISC_BOTHEDGES_gc;
+		  }
+	  }
    }
 }
 
@@ -489,6 +507,32 @@ ISR(ADC0_RESRDY_vect)
 }
 
 /*!
+ * @ingroup ISRs
+ * @brief GPIO interrupt driven by PIR sensor when in sleep mode
+ * 
+ * @param PORTC_PORT_vect
+ *  Unused parameter required by interface
+ *
+ * @return None
+ */
+ISR(PORTC_PORT_vect)
+{
+   if (PC0_INTERRUPT)
+   {
+	   // clear int flag so we don't repeatedly trigger
+	   PC0_CLEAR_INTERRUPT_FLAG; 
+	   
+	   // disable this interrupt until state machine re-enables later
+	   PORTC.PIN0CTRL &= ~PORT_ISC_BOTHEDGES_gc;
+	   
+	  // wake up to board_state_waiting
+      boardState = board_state_waiting;
+	  setLed(true);
+
+   }
+}
+
+/*!
  * @brief Return whether any wire was cut.
  *
  * @param None
@@ -513,3 +557,80 @@ static bool properWireIsCut(uint8_t inWire)
    return  ((PORTA.IN & CUT_WIRES_bm) == cut_wire_pos_array[inWire]);
 }
 
+/*!
+ * @brief Set or clear the user LED according to the provided parameter
+ *
+ * @param isLedSet
+ *  True means LED will be set, false means LED will be cleared
+ *
+ * @return None
+ */
+static void setLed(bool isLedSet)
+{
+	if (isLedSet)
+	{
+		PORTC.OUTSET = PIN2_bm;
+	}
+	else
+	{
+		PORTC.OUTCLR = PIN2_bm;
+	}
+}
+
+/*!
+ * @brief Return whether PIR sensor digital output is high at this moment.
+ * 
+ * @param None
+ * 
+ * @return True if PIR is currently triggered, else False
+ */
+static bool PIRisTriggered(void)
+{
+   return 0 != (PORTC.IN & PIN0_bm);
+}
+
+/*!
+ * @brief Blink usr LED 'count'-many times at a period of 2 * 'blinkPeriodMsec'.
+ *  NOTE: This is a blocking call!
+ * 
+ * @param count
+ *  The number of times for the LED to blink- set to zero for infinite repetitions
+ *  
+ * @param blinkPeriodMsec
+ *  The period between LED toggles in Msec
+ */
+void ledUsrBlink(uint8_t count, const int blinkPeriodMsec)
+{
+   uint8_t iter=0;
+
+   while (!count || iter < count)
+   {
+      setLed(true);
+      _delay_ms(blinkPeriodMsec);
+      setLed(false);
+      _delay_ms(blinkPeriodMsec);
+      iter++;
+   }
+   // clear LED after blinking is done
+   setLed(false);
+}
+
+/*!
+ * @brief Set or clear audio output SHDN pin based on provided bool arg.
+ * 
+ * @param isAudioEnabled
+ *   Set SHDN pin high if True, else set SHDN pin low
+ * 
+ * @return None
+ */
+static void setAudioIsEnabled(bool isAudioEnabled)
+{
+   if (isAudioEnabled) 
+   {
+      PORTB.OUTSET = PIN3_bm;
+   }   
+   else 
+   {
+      PORTB.OUTCLR = PIN3_bm;   
+   }      
+}
