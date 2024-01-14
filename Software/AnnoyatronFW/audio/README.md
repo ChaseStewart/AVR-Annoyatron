@@ -43,3 +43,4 @@ Here are the things I had to do in order to get the audio working such as it doe
 NOTE: The siren noise is mostly original from the 2009/2010 project. I guess my lab partner and I had solved this one time before, but did not write up the process to fit the audio in the previous CPU last time. 
 
 ### Python Script
+The recommended way to use the [ParseWaveFile.py](parseWaveFile.py) script is to download the community version of PyCharm, and make a new project in the Software/AnnoyatronFW/audio project. You can use a venv and a python3 interpreter and it should work right out of the box- the [wave library](https://docs.python.org/3/library/wave.html) that is used is a standard python library. You can bring .WAV files right into the audio/ folder, and by default your generated headers will be created in the Outputs/ folder- the .gitignore files are set up such that your inputs and outputs won't be accidentally contributed to the repository.
