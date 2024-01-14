@@ -16,18 +16,18 @@ You will need the following to flash your board
 
 ## Steps and Images
 First you will need to properly connect the FTDI debugger pins to the TagConnect cable, and connect the FTDI debugger to a USB cable. When that is done it should look like this:
-![Image of the full programming tool including TagConnect cable](https://github.com/[username]/[reponame]/blob/main/Software/documentation/images/Full_Programmer_and_tagConnect.jpg?raw=true)
+![Image of the full programming tool including TagConnect cable](https://github.com/ChaseStewart/AVR-Annoyatron/blob/main/Software/documentation/images/Full_Programmer_and_tagConnect.jpg?raw=true)
 
 I wound up making a custom F-F Dupont-connector cable to ensure proper orientation (I use the black GND cable and red VCC to visually confirm orientation every time), 
 but you can use jumper connectors or whatever you need. I populated the TXD, RXD, GND, and VCC pins only for this UPDI connector. 
-![Image of just the FTDI-to-USB device and its connector cable](https://github.com/[username]/[reponame]/blob/main/Software/documentation/images/Programmer_UPDI_Cable.jpg?raw=true)
+![Image of just the FTDI-to-USB device and its connector cable](https://github.com/ChaseStewart/AVR-Annoyatron/blob/main/Software/documentation/images/Programmer_UPDI_Cable.jpg?raw=true)
 
 Now that you have the cable, you are going to look for this `TAG1` footprint on the board that looks like this. 
 The feet of the TagConnect cable will go through the holes and then the little cap can be placed on the far side of the board to secure the cable. Spring tension will keep the pogo pins electrically connected the 6 circular pins on the face of the PCB. 
-![Image of the location on the PCB where the TagConnect can be attached](https://github.com/[username]/[reponame]/blob/main/Software/documentation/images/TagConnect_Footprint.jpg?raw=true)
+![Image of the location on the PCB where the TagConnect can be attached](https://github.com/ChaseStewart/AVR-Annoyatron/blob/main/Software/documentation/images/TagConnect_Footprint.jpg?raw=true)
 
 When you put it all together it should look like this:
-![Image of the TagConnect cable connected to the board](https://github.com/[username]/[reponame]/blob/main/Software/documentation/images/Board_Connection.jpg?raw=true)
+![Image of the TagConnect cable connected to the board](https://github.com/ChaseStewart/AVR-Annoyatron/blob/main/Software/documentation/images/Board_Connection.jpg?raw=true)
 
 **NOTE:** When you have the board connected to a computer, **ENSURE THE 9-VOLT BATTERY IS REMOVED OR THE POWER SWITCH IS OFF**
 
