@@ -30,7 +30,7 @@
  * @section source_code Source Code 
  * <a href="https://github.com/ChaseStewart/AVR-Annoyatron">AVR-Annoyatron on GitHub</a>
  */
-#include "audioArrays.h"
+#include "audio/audioArrays.h"
 #include "main.h"
 #include "I2C.h"
 #include "SevenSeg.h"
