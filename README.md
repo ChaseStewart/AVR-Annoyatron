@@ -16,6 +16,10 @@ Rebuilding an undergrad embedded systems final project to reflect new knowledge 
 
 `/Software/AnnoyatronFW/...` - Firmware for the Annoyatron project, in the form of a Microchip Studio project
 
+# Guides
+* To learn more about Audio, read [here](Software/AnnoyatronFW/audio/README.md)
+* To learn more about Programming the board, read [here](Software/README.md)
+
 # Setup Instructions
 
 ## Hardware
