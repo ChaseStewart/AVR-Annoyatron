@@ -30,7 +30,7 @@
  * @section source_code Source Code 
  * <a href="https://github.com/ChaseStewart/AVR-Annoyatron">AVR-Annoyatron on GitHub</a>
  */
-#include "audioArrays.h"
+#include "audio/audioArrays.h"
 #include "main.h"
 #include "I2C.h"
 #include "SevenSeg.h"
@@ -159,7 +159,7 @@ int main(void)
                {
 				  audioIdx = 0;
                   boardState = board_state_success;
-                  sevenSegBlink(HT16K33_BLINK_2HZ);
+                  sevenSegBlink(HT16K33_BLINK_HALFHZ);
                   writeSevenSeg();
                }
                else
@@ -173,7 +173,7 @@ int main(void)
             break;
          
          case board_state_failure:
-		    if (audioIdx >= sizeof(goodbye))
+		    if (audioIdx >= sizeof(youLose))
 			{
 				setAudioIsEnabled(false);
 				boardState = board_state_done;
@@ -182,7 +182,7 @@ int main(void)
             break;
 			
 		case board_state_success:
-		    if (audioIdx >= sizeof(shutdown))
+		    if (audioIdx >= sizeof(youWin))
 		    {
 			    setAudioIsEnabled(false);
 			    boardState = board_state_done;
@@ -475,13 +475,13 @@ ISR(TCA0_LUNF_vect)
          audioIdx = (audioIdx < sizeof(siren)) ? audioIdx + 1 : 0;
 		 break; 
 	  case board_state_success:
-         TCA0.SPLIT.LCMP1 = (shutdown[audioIdx]);
-         audioIdx = (audioIdx < sizeof(shutdown)) ? audioIdx + 1 : audioIdx;
+         TCA0.SPLIT.LCMP1 = (youWin[audioIdx]);
+         audioIdx = (audioIdx < sizeof(youWin)) ? audioIdx + 1 : audioIdx;
 	     break;
 		 
 	  case board_state_failure:
-         TCA0.SPLIT.LCMP1 = (goodbye[audioIdx]);
-         audioIdx = (audioIdx < sizeof(goodbye)) ? audioIdx + 1 : audioIdx;
+         TCA0.SPLIT.LCMP1 = (youLose[audioIdx]);
+         audioIdx = (audioIdx < sizeof(youLose)) ? audioIdx + 1 : audioIdx;
 	     break;
 
       default:
