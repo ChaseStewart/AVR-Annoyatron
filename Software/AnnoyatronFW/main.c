@@ -88,7 +88,6 @@ int main(void)
    pirLowCount = 0;
    ADCResRdy = false;
    counterRollover = false;
-   boardState = board_state_wire_setup;
    tcbCount = 10*100;
    blinkCount = BLINK_COUNT_SHORT;
    initPeripherals();
@@ -105,6 +104,10 @@ int main(void)
    writeAllDigits(SEVENSEG_NONE);   
    TCB0.CTRLA = TCB_ENABLE_bm;
 
+   boardState = board_state_sleep;
+   setLed(false);
+   PORTC.PIN0CTRL |= PORT_ISC_BOTHEDGES_gc;
+   
    while(1)
    {
 
@@ -117,6 +120,9 @@ int main(void)
                sevenSegBlink(HT16K33_BLINK_OFF);
                writeAllDigits(SEVENSEG_NONE);
                boardState = board_state_sleep;
+			   pirHighCount = 0;
+			   pirLowCount = 0;
+               setLed(false);
                PORTC.PIN0CTRL |= PORT_ISC_BOTHEDGES_gc;
 			}
 			break;
