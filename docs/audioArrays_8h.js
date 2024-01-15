@@ -1,6 +1,6 @@
 var audioArrays_8h =
 [
-    [ "goodbye", "audioArrays_8h.html#a1f478e5daca108f4fa770a2dddbaf2c0", null ],
-    [ "shutdown", "audioArrays_8h.html#a179d510b0fee17cbd9bf6cce90b0d721", null ],
-    [ "siren", "audioArrays_8h.html#a8de2179d35262920de67ddec7a6545ae", null ]
+    [ "siren", "audioArrays_8h.html#a8de2179d35262920de67ddec7a6545ae", null ],
+    [ "youLose", "audioArrays_8h.html#a91aff77fa79d72dffa7accf6f94467d5", null ],
+    [ "youWin", "audioArrays_8h.html#a377ea5c8d774115dd3c4de3d120ce9f4", null ]
 ];

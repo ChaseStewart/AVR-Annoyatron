@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['numbertable_0',['numbertable',['../SevenSeg_8h.html#a14d471d3a90c2c9ee6a40c7448900121',1,'SevenSeg.h']]]
+  ['pirhighcount_0',['pirHighCount',['../main_8c.html#a57d75811d08de969797a4e69d187f1ac',1,'main.c']]],
+  ['pirlowcount_1',['pirLowCount',['../main_8c.html#a3cf4d6b37c37bf6b74cc68f837001a55',1,'main.c']]]
 ];

@@ -32,6 +32,14 @@ var NAVTREE =
       [ "Author", "index.html#author", null ],
       [ "Source Code", "index.html#source_code", null ]
     ] ],
+    [ "AUDIO Readme", "md_G__Projects_GitHub_AVR_Annoyatron_Software_AnnoyatronFW_audio_README.html", [
+      [ "Author", "md_G__Projects_GitHub_AVR_Annoyatron_Software_AnnoyatronFW_audio_README.html#autotoc_md1", null ],
+      [ "Overview", "md_G__Projects_GitHub_AVR_Annoyatron_Software_AnnoyatronFW_audio_README.html#autotoc_md2", [
+        [ "Audio Challenges", "md_G__Projects_GitHub_AVR_Annoyatron_Software_AnnoyatronFW_audio_README.html#autotoc_md3", null ],
+        [ "Audio Solution", "md_G__Projects_GitHub_AVR_Annoyatron_Software_AnnoyatronFW_audio_README.html#autotoc_md4", null ],
+        [ "Python Script", "md_G__Projects_GitHub_AVR_Annoyatron_Software_AnnoyatronFW_audio_README.html#autotoc_md5", null ]
+      ] ]
+    ] ],
     [ "Modules", "modules.html", "modules" ],
     [ "Files", "files.html", [
       [ "File List", "files.html", "files_dup" ],

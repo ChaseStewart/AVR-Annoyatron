@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['tcbcount_0',['tcbCount',['../main_8c.html#abd36a2fa56aee967fd14f3503695fb7f',1,'main.c']]],
-  ['timeout_5fcnt_1',['timeout_cnt',['../I2C_8c.html#afec892dcd55e2c1d24cd3f1e33b6d24e',1,'timeout_cnt():&#160;I2C.c'],['../I2C_8h.html#afec892dcd55e2c1d24cd3f1e33b6d24e',1,'timeout_cnt():&#160;I2C.c']]],
-  ['twi0_5fbaud_2',['TWI0_BAUD',['../I2C_8h.html#a1f8aff30880315441a28e8e699dcc8a4',1,'I2C.h']]]
+  ['wireiscut_0',['wireIsCut',['../main_8c.html#a086fa831c52336b069ba25f1e119a3a2',1,'main.c']]],
+  ['write_5ftimeout_1',['WRITE_TIMEOUT',['../I2C_8h.html#a3af75bd8417b347229705d6d522ad5c3',1,'I2C.h']]],
+  ['writealldigits_2',['writeAllDigits',['../SevenSeg_8c.html#aede6b0213ab96608a91f0bc18c5e6880',1,'SevenSeg.c']]],
+  ['writesevenseg_3',['writeSevenSeg',['../SevenSeg_8c.html#ad16c3a2d8f8166adbf10f62015c3fcdc',1,'writeSevenSeg(void):&#160;SevenSeg.c'],['../SevenSeg_8h.html#ad16c3a2d8f8166adbf10f62015c3fcdc',1,'writeSevenSeg(void):&#160;SevenSeg.c']]]
 ];
